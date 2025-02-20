@@ -1,19 +1,9 @@
 ﻿@page "/"
 
-<h3>Contador</h3>
+<PageTitle>Index</PageTitle>
 
-<p>Valor atual: @Counter</p>
+<h1>Hello, world!</h1>
 
-<button @onclick="StartIncrementing">Incrementar</button>
+Welcome to your new app.
 
-@code {
-    private int Counter = 1;
-
-    private void StartIncrementing()
-    {
-        if (Counter < 100)
-        {
-            Counter++;
-        }
-    }
-}
+<SurveyPrompt Title="How is Blazor working for you?" />
