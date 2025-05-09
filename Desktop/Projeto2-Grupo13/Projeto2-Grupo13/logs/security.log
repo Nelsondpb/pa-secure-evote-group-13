@@ -1,0 +1,16 @@
+2025-05-08 21:31:27.027 [Thread-0] INFO  SecurityLogger - AR_SERVER_STARTED
+2025-05-08 21:31:28.880 [Thread-1] INFO  SecurityLogger - REGISTRO_COMPLETO: Eleitor_Teste
+2025-05-08 21:31:28.882 [Thread-1] INFO  SecurityLogger - CERTIFICATE_ISSUED: Eleitor_Teste
+2025-05-08 21:31:28.886 [main] INFO  SecurityLogger - VALIDACAO_CERTIFICADO_SUCESSO: Eleitor_Teste
+2025-05-08 21:34:26.791 [Thread-0] INFO  SecurityLogger - AR_SERVER_STARTED
+2025-05-08 21:34:28.432 [Thread-1] INFO  SecurityLogger - REGISTRO_COMPLETO: Eleitor_Teste
+2025-05-08 21:34:28.434 [Thread-1] INFO  SecurityLogger - CERTIFICATE_ISSUED: Eleitor_Teste
+2025-05-08 21:34:28.440 [main] INFO  SecurityLogger - VALIDACAO_CERTIFICADO_SUCESSO: Eleitor_Teste
+2025-05-08 21:34:47.469 [Thread-0] INFO  SecurityLogger - AR_SERVER_STARTED
+2025-05-08 21:34:49.192 [Thread-1] INFO  SecurityLogger - REGISTRO_COMPLETO: Eleitor_Teste
+2025-05-08 21:34:49.194 [Thread-1] INFO  SecurityLogger - CERTIFICATE_ISSUED: Eleitor_Teste
+2025-05-08 21:34:49.200 [main] INFO  SecurityLogger - VALIDACAO_CERTIFICADO_SUCESSO: Eleitor_Teste
+2025-05-08 21:36:46.008 [Thread-0] INFO  SecurityLogger - AR_SERVER_STARTED
+2025-05-08 21:36:47.723 [Thread-1] INFO  SecurityLogger - REGISTRO_COMPLETO: Eleitor_Teste
+2025-05-08 21:36:47.726 [Thread-1] INFO  SecurityLogger - CERTIFICATE_ISSUED: Eleitor_Teste
+2025-05-08 21:36:47.733 [main] INFO  SecurityLogger - VALIDACAO_CERTIFICADO_SUCESSO: Eleitor_Teste

@@ -1,0 +1,36 @@
+2025-05-08 21:31:26.796 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-08 21:31:27.027 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-08 21:31:28.716 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-08 21:31:28.733 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-08 21:31:28.872 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: Eleitor_Teste
+2025-05-08 21:31:28.876 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: Eleitor_Teste
+2025-05-08 21:31:28.880 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: Eleitor_Teste
+2025-05-08 21:31:28.882 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: Eleitor_Teste
+2025-05-08 21:31:28.886 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: Eleitor_Teste
+2025-05-08 21:34:26.533 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-08 21:34:26.790 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-08 21:34:28.271 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-08 21:34:28.275 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-08 21:34:28.429 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: Eleitor_Teste
+2025-05-08 21:34:28.429 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: Eleitor_Teste
+2025-05-08 21:34:28.433 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: Eleitor_Teste
+2025-05-08 21:34:28.434 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: Eleitor_Teste
+2025-05-08 21:34:28.439 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: Eleitor_Teste
+2025-05-08 21:34:47.258 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-08 21:34:47.469 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-08 21:34:49.003 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-08 21:34:49.006 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-08 21:34:49.188 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: Eleitor_Teste
+2025-05-08 21:34:49.188 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: Eleitor_Teste
+2025-05-08 21:34:49.193 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: Eleitor_Teste
+2025-05-08 21:34:49.194 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: Eleitor_Teste
+2025-05-08 21:34:49.199 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: Eleitor_Teste
+2025-05-08 21:36:45.713 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-08 21:36:46.007 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-08 21:36:47.538 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-08 21:36:47.540 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-08 21:36:47.719 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: Eleitor_Teste
+2025-05-08 21:36:47.719 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: Eleitor_Teste
+2025-05-08 21:36:47.724 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: Eleitor_Teste
+2025-05-08 21:36:47.727 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: Eleitor_Teste
+2025-05-08 21:36:47.732 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: Eleitor_Teste
