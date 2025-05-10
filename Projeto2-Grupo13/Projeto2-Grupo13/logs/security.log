@@ -1,0 +1,4 @@
+2025-05-10 20:12:11.570 [Thread-0] INFO  SecurityLogger - AR_SERVER_STARTED
+2025-05-10 20:12:13.251 [Thread-1] INFO  SecurityLogger - REGISTRO_COMPLETO: Eleitor_Teste
+2025-05-10 20:12:13.251 [Thread-1] INFO  SecurityLogger - CERTIFICATE_ISSUED: Eleitor_Teste
+2025-05-10 20:12:13.259 [main] INFO  SecurityLogger - VALIDACAO_CERTIFICADO_SUCESSO: Eleitor_Teste

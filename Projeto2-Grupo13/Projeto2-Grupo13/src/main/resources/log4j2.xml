@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Appenders>
+        <RollingFile name="File" fileName="logs/evote.log"
+                     filePattern="logs/evote-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <RollingFile name="SecurityFile" fileName="logs/security.log"
+                     filePattern="logs/security-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="File"/>
+        </Root>
+
+        <Logger name="SecurityLogger" level="info" additivity="false">
+            <AppenderRef ref="SecurityFile"/>
+        </Logger>
+
+        <Logger name="ar" level="debug"/>
+        <Logger name="sv" level="debug"/>
+        <Logger name="ue" level="debug"/>
+
+        <Logger name="org.apache" level="warn"/>
+        <Logger name="javax.net.ssl" level="warn"/>
+    </Loggers>
+</Configuration>
