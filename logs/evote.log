@@ -1,0 +1,4 @@
+2025-05-11 18:13:21.014 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 18:13:21.049 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 18:13:21.051 [main] INFO  ue.UrnaEletronica - Urna eletrônica inicializada. Candidatos válidos: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 18:13:21.436 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
