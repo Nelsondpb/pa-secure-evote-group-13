@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PacoteVoto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">shared</a> &gt; <span class="el_source">PacoteVoto.java</span></div><h1>PacoteVoto.java</h1><pre class="source lang-java linenums">package shared;
+
+import java.io.*;
+import java.security.*;
+import java.util.Arrays;
+
+/**
+ * Representa um pacote de voto contendo o voto encriptado, a chave AES encriptada,
+ * e um hash para verificar a integridade do conteúdo.
+ */
+public class PacoteVoto implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final byte[] votoEncriptado;
+    private final byte[] chaveEncriptada;
+    private final byte[] hash;
+
+    /**
+     * Construtor que recebe os dados encriptados e gera o hash de integridade.
+     *
+     * @param votoEncriptado dados do voto encriptado
+     * @param chaveEncriptada chave AES encriptada
+     * @throws NoSuchAlgorithmException se o algoritmo SHA-256 não estiver disponível
+     */
+<span class="fc" id="L24">    public PacoteVoto(byte[] votoEncriptado, byte[] chaveEncriptada) throws NoSuchAlgorithmException {</span>
+<span class="fc" id="L25">        this.votoEncriptado = votoEncriptado;</span>
+<span class="fc" id="L26">        this.chaveEncriptada = chaveEncriptada;</span>
+<span class="fc" id="L27">        this.hash = calcularHash();</span>
+<span class="fc" id="L28">    }</span>
+
+    /**
+     * Calcula o hash SHA-256 dos dados concatenados do voto e chave.
+     *
+     * @return hash gerado
+     * @throws NoSuchAlgorithmException se SHA-256 não estiver disponível
+     */
+    private byte[] calcularHash() throws NoSuchAlgorithmException {
+<span class="fc" id="L37">        MessageDigest digest = MessageDigest.getInstance(&quot;SHA-256&quot;);</span>
+<span class="fc" id="L38">        byte[] dados = concatenarArrays(votoEncriptado, chaveEncriptada);</span>
+<span class="fc" id="L39">        return digest.digest(dados);</span>
+    }
+
+    /**
+     * Concatena dois arrays de bytes.
+     *
+     * @param a primeiro array
+     * @param b segundo array
+     * @return array resultante da concatenação
+     */
+    private byte[] concatenarArrays(byte[] a, byte[] b) {
+<span class="fc" id="L50">        byte[] result = new byte[a.length + b.length];</span>
+<span class="fc" id="L51">        System.arraycopy(a, 0, result, 0, a.length);</span>
+<span class="fc" id="L52">        System.arraycopy(b, 0, result, a.length, b.length);</span>
+<span class="fc" id="L53">        return result;</span>
+    }
+
+    /**
+     * Verifica a integridade dos dados comparando o hash armazenado com um novo hash calculado.
+     *
+     * @return true se os hashes coincidem, false caso contrário
+     * @throws NoSuchAlgorithmException se SHA-256 não estiver disponível
+     */
+    public boolean verificarIntegridade() throws NoSuchAlgorithmException {
+<span class="fc" id="L63">        byte[] novoHash = calcularHash();</span>
+<span class="fc" id="L64">        return Arrays.equals(this.hash, novoHash);</span>
+    }
+
+    /**
+     * Serializa o objeto para um array de bytes.
+     *
+     * @return array de bytes representando o objeto
+     * @throws IOException se ocorrer erro na escrita
+     */
+    public byte[] toByteArray() throws IOException {
+<span class="fc" id="L74">        ByteArrayOutputStream bos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L75">        ObjectOutputStream out = new ObjectOutputStream(bos);</span>
+<span class="fc" id="L76">        out.writeObject(this);</span>
+<span class="fc" id="L77">        return bos.toByteArray();</span>
+    }
+
+    /**
+     * Reconstrói um objeto PacoteVoto a partir de um array de bytes serializado.
+     *
+     * @param data array de bytes contendo o objeto serializado
+     * @return objeto PacoteVoto
+     * @throws IOException se ocorrer erro na leitura
+     * @throws ClassNotFoundException se a classe do objeto não for encontrada
+     */
+    public static PacoteVoto fromByteArray(byte[] data) throws IOException, ClassNotFoundException {
+<span class="fc" id="L89">        ByteArrayInputStream bis = new ByteArrayInputStream(data);</span>
+<span class="fc" id="L90">        ObjectInputStream in = new ObjectInputStream(bis);</span>
+<span class="fc" id="L91">        return (PacoteVoto) in.readObject();</span>
+    }
+
+    // Getters
+
+    /**
+     * Retorna o voto encriptado.
+     *
+     * @return array de bytes do voto encriptado
+     */
+<span class="fc" id="L101">    public byte[] getVotoEncriptado() { return votoEncriptado; }</span>
+
+    /**
+     * Retorna a chave AES encriptada.
+     *
+     * @return array de bytes da chave encriptada
+     */
+<span class="fc" id="L108">    public byte[] getChaveEncriptada() { return chaveEncriptada; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

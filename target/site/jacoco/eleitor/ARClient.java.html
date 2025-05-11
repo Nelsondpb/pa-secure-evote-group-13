@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ARClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">eleitor</a> &gt; <span class="el_source">ARClient.java</span></div><h1>ARClient.java</h1><pre class="source lang-java linenums">package eleitor;
+
+import shared.CertificadoEleitor;
+import shared.NetworkUtils;
+import shared.SSLUtils;
+import javax.net.ssl.SSLSocket;
+import java.io.IOException;
+import java.security.PublicKey;
+/**
+ * Cliente responsável por se conectar à Autoridade de Registo (AR) via SSL
+ * e submeter um certificado de eleitor para assinatura.
+ */
+<span class="nc" id="L13">public class ARClient {</span>
+    private static final String AR_HOST = &quot;localhost&quot;;
+    private static final int AR_PORT = 9090;
+
+
+    /**
+     * Envia um certificado para a AR para ser assinado.
+     *
+     * @param identificacao identificação única do eleitor
+     * @param chavePublica  chave pública do eleitor
+     * @return o certificado assinado pela AR
+     * @throws Exception em caso de erro de conexão ou falha de protocolo
+     */
+    public static CertificadoEleitor enviarCertificadoParaAR(
+            String identificacao, PublicKey chavePublica) throws Exception {
+
+<span class="nc" id="L29">        SSLSocket socket = null;</span>
+        try {
+<span class="nc" id="L31">            socket = (SSLSocket) SSLUtils.criarContextoSSL()</span>
+<span class="nc" id="L32">                    .getSocketFactory().createSocket(AR_HOST, AR_PORT);</span>
+
+<span class="nc" id="L34">            socket.setSoTimeout(10000);</span>
+
+<span class="nc" id="L36">            CertificadoEleitor certificado = new CertificadoEleitor(identificacao, chavePublica);</span>
+<span class="nc" id="L37">            NetworkUtils.sendObject(socket, certificado);</span>
+
+<span class="nc" id="L39">            CertificadoEleitor resposta = (CertificadoEleitor) NetworkUtils.receiveObject(socket);</span>
+<span class="nc" id="L40">            return resposta;</span>
+
+        } finally {
+<span class="nc bnc" id="L43" title="All 4 branches missed.">            if (socket != null &amp;&amp; !socket.isClosed()) {</span>
+                try {
+<span class="nc" id="L45">                    socket.close();</span>
+<span class="nc" id="L46">                } catch (IOException e) {</span>
+<span class="nc" id="L47">                    System.err.println(&quot;Erro ao fechar socket: &quot; + e.getMessage());</span>
+<span class="nc" id="L48">                }</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

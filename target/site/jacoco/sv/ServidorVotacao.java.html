@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServidorVotacao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">sv</a> &gt; <span class="el_source">ServidorVotacao.java</span></div><h1>ServidorVotacao.java</h1><pre class="source lang-java linenums">package sv;
+
+import ar.AutoridadeRegisto;
+import shared.CertificadoEleitor;
+import shared.exceptions.AutenticacaoFalhouException;
+import java.security.PublicKey;
+import java.util.UUID;
+
+/**
+ * Representa o servidor de votação que autentica eleitores com base
+ * nos seus certificados e gera tokens únicos para autorização de votos.
+ */
+public class ServidorVotacao {
+    private final AutoridadeRegisto ar;
+    private final PublicKey chavePublicaAA;
+    private final TokenService tokenService;
+
+    /**
+     * Constrói o servidor de votação.
+     *
+     * @param ar instância da autoridade de registo
+     * @param chavePublicaAA chave pública da autoridade de apuramento
+     */
+<span class="nc" id="L24">    public ServidorVotacao(AutoridadeRegisto ar, PublicKey chavePublicaAA) {</span>
+<span class="nc" id="L25">        this.ar = ar;</span>
+<span class="nc" id="L26">        this.chavePublicaAA = chavePublicaAA;</span>
+<span class="nc" id="L27">        this.tokenService = new TokenService();</span>
+<span class="nc" id="L28">    }</span>
+
+    /**
+     * Autentica um eleitor através do seu certificado e emite um token único.
+     *
+     * @param certificado certificado do eleitor
+     * @return token de autenticação
+     * @throws AutenticacaoFalhouException se a autenticação falhar
+     */
+    public UUID autenticarEleitor(CertificadoEleitor certificado) throws AutenticacaoFalhouException {
+        try {
+<span class="nc" id="L39">            System.out.println(&quot;\n🔐 Iniciando autenticação para: &quot; + certificado.getIdentificacao());</span>
+
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            if (certificado == null) {</span>
+<span class="nc" id="L42">                throw new AutenticacaoFalhouException(&quot;Certificado nulo&quot;);</span>
+            }
+
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (!ar.validarCertificado(certificado)) {</span>
+<span class="nc" id="L46">                throw new AutenticacaoFalhouException(&quot;Certificado inválido&quot;);</span>
+            }
+
+<span class="nc" id="L49">            UUID token = tokenService.emitirToken();</span>
+<span class="nc" id="L50">            System.out.println(&quot;✅ Token emitido para: &quot; + certificado.getIdentificacao());</span>
+<span class="nc" id="L51">            return token;</span>
+<span class="nc" id="L52">        } catch (Exception e) {</span>
+<span class="nc" id="L53">            throw new AutenticacaoFalhouException(&quot;Falha na autenticação: &quot; + e.getMessage());</span>
+        }
+    }
+
+    /**
+     * Valida se o token fornecido é reconhecido pelo sistema.
+     *
+     * @param token token a ser verificado
+     * @return true se o token for válido, false caso contrário
+     */
+    public boolean validarToken(UUID token) {
+<span class="nc" id="L64">        return tokenService.validarToken(token);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

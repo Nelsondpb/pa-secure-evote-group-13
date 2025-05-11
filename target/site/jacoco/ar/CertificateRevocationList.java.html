@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificateRevocationList.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">ar</a> &gt; <span class="el_source">CertificateRevocationList.java</span></div><h1>CertificateRevocationList.java</h1><pre class="source lang-java linenums">package ar;
+
+import shared.CertificadoEleitor;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+/**
+ * Representa uma lista de revogação de certificados (CRL - Certificate Revocation List).
+ * Armazena e permite consultar certificados de eleitores revogados.
+ */
+<span class="fc" id="L10">public class CertificateRevocationList {</span>
+<span class="fc" id="L11">    private final Map&lt;String, CertificadoEleitor&gt; certificadosRevogados = new ConcurrentHashMap&lt;&gt;();</span>
+    /**
+     * Adiciona um certificado à lista de revogados.
+     *
+     * @param certificado o certificado de eleitor a ser revogado
+     */
+    public synchronized void adicionarRevogacao(CertificadoEleitor certificado) {
+<span class="fc" id="L18">        certificadosRevogados.put(certificado.getIdentificacao(), certificado);</span>
+<span class="fc" id="L19">    }</span>
+    /**
+     * Verifica se o certificado associado ao ID fornecido está revogado.
+     *
+     * @param identificacaoEleitor ID do eleitor
+     * @return true se o certificado estiver revogado; false caso contrário
+     */
+    public synchronized boolean isRevogado(String identificacaoEleitor) {
+<span class="fc" id="L27">        return certificadosRevogados.containsKey(identificacaoEleitor);</span>
+    }
+    /**
+     * Retorna a lista completa de certificados revogados.
+     *
+     * @return lista de {@link CertificadoEleitor} revogados
+     */
+    public synchronized List&lt;CertificadoEleitor&gt; getCRL() {
+<span class="fc" id="L35">        return new ArrayList&lt;&gt;(certificadosRevogados.values());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

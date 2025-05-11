@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificadoEleitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">shared</a> &gt; <span class="el_source">CertificadoEleitor.java</span></div><h1>CertificadoEleitor.java</h1><pre class="source lang-java linenums">package shared;
+
+import java.io.*;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.Date;
+
+/**
+ * Representa um certificado digital de eleitor contendo
+ * a identificacao, chave publica, datas de validade e assinatura digital.
+ * Pode ser serializado e verificado usando chaves RSA.
+ */
+public class CertificadoEleitor implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private final String identificacao;
+    private transient PublicKey chavePublica;
+    private byte[] assinatura;
+    private byte[] chavePublicaBytes;
+    private final Date dataEmissao;
+    private final Date dataExpiracao;
+    private boolean revogado;
+
+    /**
+     * Construtor de certificado de eleitor.
+     * @param identificacao identificador unico do eleitor
+     * @param chavePublica chave publica do eleitor
+     */
+<span class="fc" id="L30">    public CertificadoEleitor(String identificacao, PublicKey chavePublica) {</span>
+<span class="fc" id="L31">        this.identificacao = identificacao;</span>
+<span class="fc" id="L32">        this.chavePublica = chavePublica;</span>
+<span class="fc" id="L33">        this.chavePublicaBytes = chavePublica.getEncoded();</span>
+<span class="fc" id="L34">        this.dataEmissao = new Date();</span>
+<span class="fc" id="L35">        this.dataExpiracao = calcularDataExpiracao();</span>
+<span class="fc" id="L36">        this.revogado = false;</span>
+<span class="fc" id="L37">    }</span>
+
+    /**
+     * Calcula a data de expiracao do certificado (1 ano apos emissao).
+     * @return data de expiracao
+     */
+    private Date calcularDataExpiracao() {
+<span class="fc" id="L44">        long umAnoEmMillis = 365L * 24 * 60 * 60 * 1000;</span>
+<span class="fc" id="L45">        return new Date(dataEmissao.getTime() + umAnoEmMillis);</span>
+    }
+
+    /**
+     * Serializa o objeto, incluindo a chave publica codificada.
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {
+<span class="fc" id="L52">        out.defaultWriteObject();</span>
+<span class="fc" id="L53">        out.writeObject(this.chavePublicaBytes);</span>
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * Desserializa o objeto e reconstrói a chave publica.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+<span class="fc" id="L60">        in.defaultReadObject();</span>
+<span class="fc" id="L61">        this.chavePublicaBytes = (byte[]) in.readObject();</span>
+        try {
+<span class="fc" id="L63">            this.chavePublica = KeyFactory.getInstance(&quot;RSA&quot;)</span>
+<span class="fc" id="L64">                    .generatePublic(new X509EncodedKeySpec(chavePublicaBytes));</span>
+<span class="nc" id="L65">        } catch (Exception e) {</span>
+<span class="nc" id="L66">            throw new IOException(&quot;Falha ao reconstruir PublicKey&quot;, e);</span>
+<span class="fc" id="L67">        }</span>
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * Verifica se o certificado esta valido (nao revogado e nao expirado).
+     * @return true se valido, false caso contrario
+     */
+    public boolean isValido() {
+<span class="fc" id="L75">        Date agora = new Date();</span>
+<span class="pc bpc" id="L76" title="1 of 4 branches missed.">        return !revogado &amp;&amp; agora.before(dataExpiracao);</span>
+    }
+
+    /**
+     * Marca o certificado como revogado.
+     */
+    public void revogar() {
+<span class="fc" id="L83">        this.revogado = true;</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * Retorna os dados brutos usados para assinar/verificar o certificado.
+     * @return bytes dos dados de assinatura
+     */
+    public byte[] getDadosParaAssinatura() {
+<span class="fc" id="L91">        String dados = identificacao + Base64.getEncoder().encodeToString(chavePublicaBytes);</span>
+<span class="fc" id="L92">        return dados.getBytes();</span>
+    }
+
+    /**
+     * Define a assinatura digital do certificado.
+     * @param assinatura bytes da assinatura
+     */
+    public void setAssinatura(byte[] assinatura) {
+<span class="fc" id="L100">        this.assinatura = assinatura;</span>
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * Verifica se a assinatura digital é valida usando a chave publica da AR.
+     * @param chavePublicaAR chave usada para verificacao
+     * @return true se a assinatura for valida
+     */
+    public boolean verificarAssinatura(PublicKey chavePublicaAR) {
+<span class="pc bpc" id="L109" title="1 of 4 branches missed.">        if (assinatura == null || chavePublicaAR == null) {</span>
+<span class="fc" id="L110">            return false;</span>
+        }
+
+        try {
+<span class="fc" id="L114">            Signature sig = Signature.getInstance(&quot;SHA256withRSA&quot;);</span>
+<span class="fc" id="L115">            sig.initVerify(chavePublicaAR);</span>
+<span class="fc" id="L116">            sig.update(this.getDadosParaAssinatura());</span>
+<span class="fc" id="L117">            return sig.verify(this.assinatura);</span>
+<span class="nc" id="L118">        } catch (Exception e) {</span>
+<span class="nc" id="L119">            System.err.println(&quot;Erro na verificacao: &quot; + e.getMessage());</span>
+<span class="nc" id="L120">            return false;</span>
+        }
+    }
+
+    /**
+     * Formata o certificado em uma representacao estilo PEM.
+     * @return string formatada com dados e assinatura
+     */
+    public String toPemFormat() {
+<span class="fc" id="L129">        return &quot;-----BEGIN CERTIFICATE-----\n&quot; +</span>
+<span class="fc" id="L130">                Base64.getEncoder().encodeToString(this.getDadosParaAssinatura()) +</span>
+                &quot;\n-----END CERTIFICATE-----\n&quot; +
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                &quot;Assinatura: &quot; + (assinatura != null ? Base64.getEncoder().encodeToString(assinatura) : &quot;NÃO ASSINADO&quot;) +</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">                &quot;\nValidade: &quot; + (isValido() ? &quot;VÃLIDO&quot; : &quot;INVÃLIDO&quot;) +</span>
+                &quot;\nExpira em: &quot; + dataExpiracao;
+    }
+
+    // Getters
+
+    /** @return identificacao do eleitor */
+<span class="fc" id="L140">    public String getIdentificacao() { return identificacao; }</span>
+
+    /** @return chave publica do eleitor */
+<span class="fc" id="L143">    public PublicKey getChavePublica() { return chavePublica; }</span>
+
+    /** @return assinatura digital do certificado */
+<span class="fc" id="L146">    public byte[] getAssinatura() { return assinatura; }</span>
+
+    /** @return data de emissao do certificado */
+<span class="nc" id="L149">    public Date getDataEmissao() { return dataEmissao; }</span>
+
+    /** @return data de expiracao do certificado */
+<span class="nc" id="L152">    public Date getDataExpiracao() { return dataExpiracao; }</span>
+
+    /** @return true se o certificado estiver revogado */
+<span class="fc" id="L155">    public boolean isRevogado() { return revogado; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,177 @@
+2025-05-11 22:59:46.968 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 22:59:46.974 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 22:59:46.974 [main] INFO  ue.UrnaEletronica - Urna eletrônica inicializada. Candidatos válidos: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 22:59:47.039 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-11 22:59:53.737 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-11 22:59:53.738 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-11 22:59:53.781 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: 11
+2025-05-11 22:59:53.782 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: 11
+2025-05-11 22:59:53.783 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: 11
+2025-05-11 22:59:53.784 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: 11
+2025-05-11 22:59:53.785 [main] INFO  eleitor.Eleitor - Eleitor 11 registrado com sucesso na AR
+2025-05-11 22:59:57.075 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: 11
+2025-05-11 22:59:57.077 [main] INFO  eleitor.Eleitor - Eleitor 11 autenticado com sucesso. Token: 79642108-502c-47d5-aea5-f5773b2886a0
+2025-05-11 23:00:03.291 [main] INFO  ue.UrnaEletronica - Voto recebido e persistido. Total: 1
+2025-05-11 23:00:03.292 [main] INFO  eleitor.Eleitor - Voto do eleitor 11 registrado com sucesso
+2025-05-11 23:00:07.028 [main] INFO  ue.UrnaEletronica - Votação encerrada. Total de votos: 1
+2025-05-11 23:01:24.251 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:01:24.255 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:01:24.256 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:01:24.257 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:01:24.257 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:01:25.471 [main] INFO  ar.NotificadorService - NOTIFICAÇÃO: O certificado do eleitor eleitor123 foi revogado. 
+2025-05-11 23:01:25.517 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:01:25.517 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: eleitor2
+2025-05-11 23:01:25.517 [main] WARN  ar.AutoridadeRegisto - Assinatura inválida para: eleitor2
+2025-05-11 23:01:25.607 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:01:25.607 [main] DEBUG ar.AutoridadeRegisto - Iniciando registro para: eleitor1
+2025-05-11 23:01:25.608 [main] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: eleitor1
+2025-05-11 23:01:25.608 [main] DEBUG ar.AutoridadeRegisto - Iniciando registro para: eleitor1
+2025-05-11 23:01:25.608 [main] ERROR ar.AutoridadeRegisto - Falha no registro do eleitor eleitor1: Eleitor já registrado
+java.lang.Exception: Eleitor já registrado
+	at ar.AutoridadeRegisto.registarEleitor(AutoridadeRegisto.java:59) ~[classes/:?]
+	at ar.AutoridadeRegistoTest.lambda$testRegistarEleitorDuplicadoLancaExcecao$0(AutoridadeRegistoTest.java:49) ~[test-classes/:?]
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53) ~[junit-jupiter-api-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35) ~[junit-jupiter-api-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3083) ~[junit-jupiter-api-5.9.2.jar:5.9.2]
+	at ar.AutoridadeRegistoTest.testRegistarEleitorDuplicadoLancaExcecao(AutoridadeRegistoTest.java:49) ~[test-classes/:?]
+	at jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:580) ~[?:?]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:727) ~[junit-platform-commons-1.9.2.jar:1.9.2]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.9.2.jar:5.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at java.util.ArrayList.forEach(ArrayList.java:1597) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at java.util.ArrayList.forEach(ArrayList.java:1597) ~[?:?]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:147) ~[junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:127) ~[junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90) ~[junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:55) ~[junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:102) [junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:54) [junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) [junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86) [junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86) [junit-platform-launcher-1.9.2.jar:1.9.2]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) [surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) [surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) [surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) [surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) [surefire-booter-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) [surefire-booter-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) [surefire-booter-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) [surefire-booter-3.1.2.jar:3.1.2]
+2025-05-11 23:01:25.644 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:01:25.644 [main] DEBUG ar.AutoridadeRegisto - Iniciando registro para: eleitor1
+2025-05-11 23:01:25.645 [main] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: eleitor1
+2025-05-11 23:01:25.645 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: eleitor1
+2025-05-11 23:01:25.738 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:01:25.738 [main] DEBUG ar.AutoridadeRegisto - Iniciando registro para: eleitor1
+2025-05-11 23:01:25.739 [main] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: eleitor1
+2025-05-11 23:01:25.816 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:01:25.817 [main] DEBUG ar.AutoridadeRegisto - Iniciando registro para: eleitor3
+2025-05-11 23:01:25.818 [main] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: eleitor3
+2025-05-11 23:01:25.819 [main] INFO  ar.AutoridadeRegisto - Certificado revogado: eleitor3
+2025-05-11 23:01:25.819 [main] INFO  ar.NotificadorService - NOTIFICAÇÃO: O certificado do eleitor eleitor3 foi revogado. 
+2025-05-11 23:01:25.819 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: eleitor3
+2025-05-11 23:01:25.819 [main] WARN  ar.AutoridadeRegisto - Certificado inválido ou revogado: eleitor3
+2025-05-11 23:14:04.403 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:14:04.407 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:14:04.407 [main] INFO  ue.UrnaEletronica - Urna eletrônica inicializada. Candidatos válidos: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:14:04.467 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-11 23:14:12.437 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-11 23:14:12.438 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-11 23:14:12.479 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: 11
+2025-05-11 23:14:12.479 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: 11
+2025-05-11 23:14:12.480 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: 11
+2025-05-11 23:14:12.481 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: 11
+2025-05-11 23:14:12.483 [main] INFO  eleitor.Eleitor - Eleitor 11 registrado com sucesso na AR
+2025-05-11 23:14:14.922 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: 11
+2025-05-11 23:14:14.925 [main] INFO  eleitor.Eleitor - Eleitor 11 autenticado com sucesso. Token: 2d9702e3-2b79-4d3e-9d9a-27191afe5e1e
+2025-05-11 23:14:21.891 [main] INFO  ue.UrnaEletronica - Voto recebido e persistido. Total: 1
+2025-05-11 23:14:21.892 [main] INFO  eleitor.Eleitor - Voto do eleitor 11 registrado com sucesso
+2025-05-11 23:14:27.895 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-11 23:14:27.896 [Thread-2] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-11 23:14:27.900 [Thread-2] INFO  ar.ARClientHandler - Processando registro para: 11
+2025-05-11 23:14:27.900 [Thread-2] DEBUG ar.AutoridadeRegisto - Iniciando registro para: 11
+2025-05-11 23:14:27.900 [Thread-2] ERROR ar.AutoridadeRegisto - Falha no registro do eleitor 11: Eleitor já registrado
+java.lang.Exception: Eleitor já registrado
+	at ar.AutoridadeRegisto.registarEleitor(AutoridadeRegisto.java:59) [classes/:?]
+	at ar.ARClientHandler.run(ARClientHandler.java:70) [classes/:?]
+2025-05-11 23:14:27.902 [Thread-2] ERROR ar.ARClientHandler - Erro no handler do cliente: Eleitor já registrado
+java.lang.Exception: Eleitor já registrado
+	at ar.AutoridadeRegisto.registarEleitor(AutoridadeRegisto.java:59) ~[classes/:?]
+	at ar.ARClientHandler.run(ARClientHandler.java:70) [classes/:?]
+2025-05-11 23:14:27.903 [main] ERROR eleitor.Eleitor - Falha no registro do eleitor 11: class java.lang.String cannot be cast to class shared.CertificadoEleitor (java.lang.String is in module java.base of loader 'bootstrap'; shared.CertificadoEleitor is in unnamed module of loader 'app')
+2025-05-11 23:15:26.612 [main] INFO  ar.AutoridadeRegisto - AutoridadeRegisto inicializada com chaves públicas e privadas
+2025-05-11 23:15:26.616 [main] INFO  shared.ConfigManager - 11 candidatos carregados: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:15:26.616 [main] INFO  ue.UrnaEletronica - Urna eletrônica inicializada. Candidatos válidos: [Donald Trump, Elon Musk, Papa Leão XIV, Galileu Galilei, Albert Einstein, Arnold Schwarzenegger, Napoleão Bonaparte, Alexandre, o Grande, Leonardo da Vinci, William Shakespeare, Isaac Newton]
+2025-05-11 23:15:26.663 [Thread-0] INFO  ar.ARServer - 🔒 Servidor AR iniciado na porta 9090
+2025-05-11 23:15:35.375 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-11 23:15:35.376 [Thread-1] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-11 23:15:35.416 [Thread-1] INFO  ar.ARClientHandler - Processando registro para: 2
+2025-05-11 23:15:35.416 [Thread-1] DEBUG ar.AutoridadeRegisto - Iniciando registro para: 2
+2025-05-11 23:15:35.418 [Thread-1] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: 2
+2025-05-11 23:15:35.419 [Thread-1] INFO  ar.ARClientHandler - Registro concluído para: 2
+2025-05-11 23:15:35.421 [main] INFO  eleitor.Eleitor - Eleitor 2 registrado com sucesso na AR
+2025-05-11 23:15:49.326 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-11 23:15:49.327 [Thread-2] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-11 23:15:49.332 [Thread-2] INFO  ar.ARClientHandler - Processando registro para: 34
+2025-05-11 23:15:49.332 [Thread-2] DEBUG ar.AutoridadeRegisto - Iniciando registro para: 34
+2025-05-11 23:15:49.333 [Thread-2] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: 34
+2025-05-11 23:15:49.333 [Thread-2] INFO  ar.ARClientHandler - Registro concluído para: 34
+2025-05-11 23:15:49.334 [main] INFO  eleitor.Eleitor - Eleitor 34 registrado com sucesso na AR
+2025-05-11 23:15:51.922 [main] DEBUG ar.AutoridadeRegisto - Validando certificado para: 34
+2025-05-11 23:15:51.925 [main] INFO  eleitor.Eleitor - Eleitor 34 autenticado com sucesso. Token: a57fd7d5-8a20-467e-83e0-42caf44d87bb
+2025-05-11 23:15:57.106 [main] INFO  ue.UrnaEletronica - Voto recebido e persistido. Total: 1
+2025-05-11 23:15:57.106 [main] INFO  eleitor.Eleitor - Voto do eleitor 34 registrado com sucesso
+2025-05-11 23:16:08.850 [Thread-0] DEBUG ar.ARServer - Nova conexão recebida: 127.0.0.1
+2025-05-11 23:16:08.850 [Thread-3] DEBUG ar.ARClientHandler - Iniciando handler para cliente: 127.0.0.1
+2025-05-11 23:16:08.854 [Thread-3] INFO  ar.ARClientHandler - Processando registro para: 39
+2025-05-11 23:16:08.854 [Thread-3] DEBUG ar.AutoridadeRegisto - Iniciando registro para: 39
+2025-05-11 23:16:08.855 [Thread-3] INFO  ar.AutoridadeRegisto - Novo eleitor registrado: 39
+2025-05-11 23:16:08.855 [Thread-3] INFO  ar.ARClientHandler - Registro concluído para: 39
+2025-05-11 23:16:08.856 [main] INFO  eleitor.Eleitor - Eleitor 39 registrado com sucesso na AR

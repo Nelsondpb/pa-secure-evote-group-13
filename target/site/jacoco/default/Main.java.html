@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">    import aa.AutoridadeApuramento;
+    import ar.AutoridadeRegisto;
+    import ar.ARServer;
+    import eleitor.Eleitor;
+    import shared.CertificadoEleitor;
+    import sv.ServidorVotacao;
+    import ue.UrnaEletronica;
+
+    import java.security.*;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Scanner;
+
+<span class="nc" id="L14">    public class Main {</span>
+        private static final int SSL_PORT = 9090;
+        private static final int SERVER_START_DELAY_MS = 1500;
+<span class="nc" id="L17">        private static final Scanner scanner = new Scanner(System.in);</span>
+
+        public static final String RED = &quot;\033[0;31m&quot;;
+        public static final String GREEN = &quot;\033[0;32m&quot;;
+        public static final String YELLOW = &quot;\033[0;33m&quot;;
+        public static final String BLUE = &quot;\033[0;34m&quot;;
+        public static final String PURPLE = &quot;\033[0;35m&quot;;
+        public static final String CYAN = &quot;\033[0;36m&quot;;
+        public static final String RESET = &quot;\033[0m&quot;;
+
+        public static void main(String[] args) {
+            try {
+<span class="nc" id="L29">                configurarSSL();</span>
+
+<span class="nc" id="L31">                KeyPair parChavesAR = gerarParChavesRSA();</span>
+<span class="nc" id="L32">                KeyPair parChavesAA = gerarParChavesRSA();</span>
+
+<span class="nc" id="L34">                AutoridadeRegisto ar = new AutoridadeRegisto(parChavesAR.getPrivate(), parChavesAR.getPublic());</span>
+<span class="nc" id="L35">                ARServer arServer = new ARServer(ar);</span>
+<span class="nc" id="L36">                AutoridadeApuramento aa = new AutoridadeApuramento(parChavesAA.getPrivate(), parChavesAA.getPublic());</span>
+<span class="nc" id="L37">                ServidorVotacao sv = new ServidorVotacao(ar, aa.getChavePublicaAA());</span>
+<span class="nc" id="L38">                UrnaEletronica ue = new UrnaEletronica(sv);</span>
+
+<span class="nc" id="L40">                iniciarServidorAR(arServer);</span>
+<span class="nc" id="L41">                Thread.sleep(SERVER_START_DELAY_MS);</span>
+
+<span class="nc" id="L43">                List&lt;Eleitor&gt; eleitores = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L44">                Eleitor eleitorAtual = null;</span>
+
+                while (true) {
+<span class="nc" id="L47">                    exibirMenu();</span>
+<span class="nc" id="L48">                    int opcao = scanner.nextInt();</span>
+<span class="nc" id="L49">                    scanner.nextLine(); // Limpar buffer</span>
+
+<span class="nc bnc" id="L51" title="All 6 branches missed.">                    switch (opcao) {</span>
+                        case 1:
+<span class="nc" id="L53">                            eleitorAtual = registrarEleitor(ar);</span>
+<span class="nc" id="L54">                            eleitores.add(eleitorAtual);</span>
+<span class="nc" id="L55">                            break;</span>
+                        case 2:
+<span class="nc bnc" id="L57" title="All 2 branches missed.">                            if (eleitorAtual == null) {</span>
+<span class="nc" id="L58">                                System.out.println(RED + &quot;\n⚠️ Nenhum eleitor registrado. Registre um eleitor primeiro.&quot; + RESET);</span>
+                            } else {
+<span class="nc" id="L60">                                autenticarEleitor(eleitorAtual, sv);</span>
+                            }
+<span class="nc" id="L62">                            break;</span>
+                        case 3:
+<span class="nc bnc" id="L64" title="All 4 branches missed.">                            if (eleitorAtual == null || eleitorAtual.getTokenVoto() == null) {</span>
+<span class="nc" id="L65">                                System.out.println(RED + &quot;\n⚠️ Eleitor não autenticado. Autentique primeiro.&quot; + RESET);</span>
+                            } else {
+<span class="nc" id="L67">                                votar(eleitorAtual, ue, aa);</span>
+                            }
+<span class="nc" id="L69">                            break;</span>
+                        case 4:
+<span class="nc" id="L71">                            encerrarEApurar(ue, aa);</span>
+<span class="nc" id="L72">                            break;</span>
+                        case 5:
+<span class="nc" id="L74">                            System.out.println(GREEN + &quot;\n✅ Sistema encerrado com sucesso!&quot; + RESET);</span>
+<span class="nc" id="L75">                            System.exit(0);</span>
+                        default:
+<span class="nc" id="L77">                            System.out.println(RED + &quot;\n⚠️ Opção inválida! Tente novamente.&quot; + RESET);</span>
+                    }
+<span class="nc" id="L79">                }</span>
+
+<span class="nc" id="L81">            } catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L82">                System.err.println(RED + &quot;❌ Erro de criptografia: &quot; + e.getMessage() + RESET);</span>
+<span class="nc" id="L83">            } catch (Exception e) {</span>
+<span class="nc" id="L84">                System.err.println(RED + &quot;❌ Erro crítico: &quot; + e.getMessage() + RESET);</span>
+<span class="nc" id="L85">                e.printStackTrace();</span>
+            } finally {
+<span class="nc" id="L87">                scanner.close();</span>
+            }
+<span class="nc" id="L89">        }</span>
+
+        private static void exibirMenu() {
+<span class="nc" id="L92">            System.out.println(PURPLE + &quot;\n===  SISTEMA DE VOTAÇÃO ELETRÔNICA ===&quot; + RESET);</span>
+<span class="nc" id="L93">            System.out.println(CYAN + &quot;1. Registar-se como eleitor&quot;);</span>
+<span class="nc" id="L94">            System.out.println(&quot;2. Autenticar-se como eleitor&quot;);</span>
+<span class="nc" id="L95">            System.out.println(&quot;3. Votar nos candidatos&quot;);</span>
+<span class="nc" id="L96">            System.out.println(&quot;4. Encerrar votação e mostrar resultados&quot;);</span>
+<span class="nc" id="L97">            System.out.println(&quot;5. Sair&quot; + RESET);</span>
+<span class="nc" id="L98">            System.out.print(YELLOW + &quot;Escolha uma opção: &quot; + RESET);</span>
+<span class="nc" id="L99">        }</span>
+
+        private static void configurarSSL() {
+<span class="nc" id="L102">            System.setProperty(&quot;javax.net.ssl.keyStore&quot;, &quot;certificates/keystore.p12&quot;);</span>
+<span class="nc" id="L103">            System.setProperty(&quot;javax.net.ssl.keyStorePassword&quot;, &quot;password&quot;);</span>
+<span class="nc" id="L104">            System.setProperty(&quot;javax.net.ssl.trustStore&quot;, &quot;certificates/keystore.p12&quot;);</span>
+<span class="nc" id="L105">            System.setProperty(&quot;javax.net.ssl.trustStorePassword&quot;, &quot;password&quot;);</span>
+<span class="nc" id="L106">        }</span>
+
+        private static KeyPair gerarParChavesRSA() throws NoSuchAlgorithmException {
+<span class="nc" id="L109">            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(&quot;RSA&quot;);</span>
+<span class="nc" id="L110">            keyGen.initialize(2048);</span>
+<span class="nc" id="L111">            return keyGen.generateKeyPair();</span>
+        }
+
+        private static void iniciarServidorAR(ARServer server) {
+<span class="nc" id="L115">            new Thread(() -&gt; {</span>
+                try {
+<span class="nc" id="L117">                    System.out.println(BLUE + &quot;🔒 Servidor AR iniciando na porta &quot; + SSL_PORT + &quot;...&quot; + RESET);</span>
+<span class="nc" id="L118">                    server.start();</span>
+<span class="nc" id="L119">                } catch (Exception e) {</span>
+<span class="nc" id="L120">                    System.err.println(RED + &quot;❌ Falha no servidor AR: &quot; + e.getMessage() + RESET);</span>
+<span class="nc" id="L121">                    System.exit(1);</span>
+<span class="nc" id="L122">                }</span>
+<span class="nc" id="L123">            }).start();</span>
+<span class="nc" id="L124">        }</span>
+
+        private static Eleitor registrarEleitor(AutoridadeRegisto ar) throws Exception {
+<span class="nc" id="L127">            System.out.print(CYAN + &quot;\nDigite a identificação do eleitor: &quot; + RESET);</span>
+<span class="nc" id="L128">            String identificacao = scanner.nextLine();</span>
+
+<span class="nc" id="L130">            Eleitor eleitor = new Eleitor(identificacao);</span>
+<span class="nc" id="L131">            CertificadoEleitor certificado = eleitor.registarNaAR();</span>
+
+<span class="nc" id="L133">            System.out.println(GREEN + &quot;\n✅ Eleitor registrado com sucesso!&quot; + RESET);</span>
+<span class="nc" id="L134">            System.out.println(BLUE + &quot;📄 Certificado:\n&quot; + certificado.toPemFormat() + RESET);</span>
+<span class="nc" id="L135">            return eleitor;</span>
+        }
+
+        private static void autenticarEleitor(Eleitor eleitor, ServidorVotacao sv) throws Exception {
+<span class="nc" id="L139">            eleitor.autenticarNoSV(sv);</span>
+<span class="nc" id="L140">            System.out.println(GREEN + &quot;\n✅ Autenticação realizada com sucesso!&quot; + RESET);</span>
+<span class="nc" id="L141">            System.out.println(BLUE + &quot;🔑 Token de voto: &quot; + eleitor.getTokenVoto() + RESET);</span>
+<span class="nc" id="L142">        }</span>
+
+        private static void votar(Eleitor eleitor, UrnaEletronica ue, AutoridadeApuramento aa) throws Exception {
+<span class="nc" id="L145">            System.out.println(PURPLE + &quot;\nCandidatos disponíveis:&quot; + RESET);</span>
+<span class="nc" id="L146">            List&lt;String&gt; candidatos = ue.getConfigManager().getCandidatos();</span>
+
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            for (int i = 0; i &lt; candidatos.size(); i++) {</span>
+<span class="nc" id="L149">                String nomeCandidato = candidatos.get(i);</span>
+<span class="nc" id="L150">                String info = ue.getConfigManager().getInfoCandidato(nomeCandidato);</span>
+<span class="nc" id="L151">                System.out.println(YELLOW + (i+1) + &quot;. &quot; + nomeCandidato + &quot; - \&quot;&quot; + info + &quot;\&quot;&quot; + RESET);</span>
+            }
+
+<span class="nc" id="L154">            System.out.print(CYAN + &quot;Escolha o número do candidato: &quot; + RESET);</span>
+<span class="nc" id="L155">            int opcao = scanner.nextInt();</span>
+<span class="nc" id="L156">            scanner.nextLine(); // Limpar buffer</span>
+
+<span class="nc bnc" id="L158" title="All 4 branches missed.">            if (opcao &lt; 1 || opcao &gt; candidatos.size()) {</span>
+<span class="nc" id="L159">                System.out.println(RED + &quot;\n⚠️ Opção inválida!&quot; + RESET);</span>
+<span class="nc" id="L160">                return;</span>
+            }
+
+<span class="nc" id="L163">            String candidato = candidatos.get(opcao-1);</span>
+<span class="nc" id="L164">            eleitor.votar(candidato, ue, aa.getChavePublicaAA());</span>
+<span class="nc" id="L165">            System.out.println(GREEN + &quot;\n✅ Voto registrado para &quot; + candidato + RESET);</span>
+<span class="nc" id="L166">        }</span>
+
+        private static void encerrarEApurar(UrnaEletronica ue, AutoridadeApuramento aa) {
+<span class="nc" id="L169">            ue.encerrarVotacao();</span>
+<span class="nc" id="L170">            System.out.println(BLUE + &quot;\n⏳ Encerrando votação...&quot; + RESET);</span>
+
+            try {
+<span class="nc" id="L173">                List&lt;byte[]&gt; votosEncriptados = ue.getVotosEncriptados();</span>
+<span class="nc" id="L174">                List&lt;String&gt; votosDesencriptados = aa.desencriptarVotos(votosEncriptados);</span>
+<span class="nc" id="L175">                aa.apurarVotos(votosDesencriptados);</span>
+
+<span class="nc" id="L177">                System.out.println(PURPLE + &quot;\n=== RESULTADOS FINAIS ===&quot; + RESET);</span>
+<span class="nc" id="L178">                System.out.println(CYAN + aa.gerarRelatorio() + RESET);</span>
+<span class="nc" id="L179">            } catch (Exception e) {</span>
+<span class="nc" id="L180">                System.err.println(RED + &quot;\n❌ Erro no apuramento: &quot; + e.getMessage() + RESET);</span>
+<span class="nc" id="L181">                e.printStackTrace();</span>
+<span class="nc" id="L182">            }</span>
+<span class="nc" id="L183">        }</span>
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

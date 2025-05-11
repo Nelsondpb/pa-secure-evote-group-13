@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NetworkUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">shared</a> &gt; <span class="el_source">NetworkUtils.java</span></div><h1>NetworkUtils.java</h1><pre class="source lang-java linenums">package shared;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import javax.net.ssl.SSLSocket;
+import java.io.*;
+
+/**
+ * Classe  para envio e recebimento de objetos serializados
+ * através de sockets SSL.
+ */
+<span class="nc" id="L12">public class NetworkUtils {</span>
+<span class="nc" id="L13">    private static final Logger logger = LogManager.getLogger(NetworkUtils.class);</span>
+
+    /**
+     * Envia um objeto serializável através de um SSLSocket.
+     *
+     * @param socket socket seguro para envio
+     * @param object objeto a ser enviado
+     * @throws IOException se ocorrer erro de I/O
+     */
+    public static void sendObject(SSLSocket socket, Object object) throws IOException {
+        try {
+<span class="nc" id="L24">            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());</span>
+<span class="nc" id="L25">            oos.writeObject(object);</span>
+<span class="nc" id="L26">            oos.flush();</span>
+<span class="nc" id="L27">            logger.debug(&quot;Objeto enviado para {}&quot;, socket.getInetAddress());</span>
+<span class="nc" id="L28">        } catch (IOException e) {</span>
+<span class="nc" id="L29">            logger.error(&quot;Erro ao enviar objeto: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L30">            throw e;</span>
+<span class="nc" id="L31">        }</span>
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * Recebe um objeto serializado de um SSLSocket.
+     *
+     * @param socket socket seguro para leitura
+     * @return objeto recebido
+     * @throws IOException se ocorrer erro de I/O
+     * @throws ClassNotFoundException se a classe do objeto recebido não for encontrada
+     */
+    public static Object receiveObject(SSLSocket socket) throws IOException, ClassNotFoundException {
+        try {
+<span class="nc" id="L44">            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());</span>
+<span class="nc" id="L45">            Object obj = ois.readObject();</span>
+<span class="nc" id="L46">            logger.debug(&quot;Objeto recebido de {}&quot;, socket.getInetAddress());</span>
+<span class="nc" id="L47">            return obj;</span>
+<span class="nc" id="L48">        } catch (Exception e) {</span>
+<span class="nc" id="L49">            logger.error(&quot;Erro ao receber objeto: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L50">            throw e;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

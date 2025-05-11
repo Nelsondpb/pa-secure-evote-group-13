@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Eleitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">eleitor</a> &gt; <span class="el_source">Eleitor.java</span></div><h1>Eleitor.java</h1><pre class="source lang-java linenums">package eleitor;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ar.AutoridadeRegisto;
+import shared.*;
+import shared.exceptions.*;
+import sv.ServidorVotacao;
+import ue.UrnaEletronica;
+
+import javax.crypto.SecretKey;
+import java.security.*;
+import java.util.UUID;
+
+/**
+ * Representa um eleitor que pode registrar-se na AR, autenticar-se no servidor de votação
+ * e submeter seu voto criptografado à urna eletrônica.
+ */
+public class Eleitor {
+<span class="nc" id="L20">    private static final Logger logger = LogManager.getLogger(Eleitor.class);</span>
+
+    private final String identificacao;
+    private final KeyPair parChaves;
+    private CertificadoEleitor certificado;
+    private UUID tokenVoto;
+
+
+    /**
+     * Construtor que gera um novo par de chaves para o eleitor.
+     *
+     * @param identificacao identificação única do eleitor
+     * @throws NoSuchAlgorithmException se o algoritmo RSA não estiver disponível
+     */
+<span class="nc" id="L34">    public Eleitor(String identificacao) throws NoSuchAlgorithmException {</span>
+<span class="nc bnc" id="L35" title="All 4 branches missed.">        if (identificacao == null || identificacao.isBlank()) {</span>
+<span class="nc" id="L36">            throw new IllegalArgumentException(&quot;Identificação do eleitor não pode ser vazia&quot;);</span>
+        }
+<span class="nc" id="L38">        this.identificacao = identificacao;</span>
+
+<span class="nc" id="L40">        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(&quot;RSA&quot;);</span>
+<span class="nc" id="L41">        keyGen.initialize(2048);</span>
+<span class="nc" id="L42">        this.parChaves = keyGen.generateKeyPair();</span>
+
+<span class="nc" id="L44">        logger.debug(&quot;Novo eleitor criado: {}&quot;, identificacao);</span>
+<span class="nc" id="L45">    }</span>
+
+
+    /**
+     * Registra o eleitor na AR (Autoridade de Registo) e recebe um certificado assinado.
+     *
+     * @return o certificado assinado
+     * @throws Exception se ocorrer erro na comunicação ou rejeição do certificado
+     */
+    public CertificadoEleitor registarNaAR() throws Exception {
+        try {
+<span class="nc" id="L56">            this.certificado = ARClient.enviarCertificadoParaAR(identificacao, parChaves.getPublic());</span>
+<span class="nc" id="L57">            logger.info(&quot;Eleitor {} registrado com sucesso na AR&quot;, identificacao);</span>
+<span class="nc" id="L58">            return certificado;</span>
+<span class="nc" id="L59">        } catch (Exception e) {</span>
+<span class="nc" id="L60">            logger.error(&quot;Falha no registro do eleitor {}: {}&quot;, identificacao, e.getMessage());</span>
+<span class="nc" id="L61">            throw e;</span>
+        }
+    }
+    /**
+     * Autentica o eleitor junto ao servidor de votação.
+     *
+     * @param servidorVotacao instância do servidor de votação
+     * @throws AutenticacaoFalhouException se o certificado for inválido ou rejeitado
+     */
+
+    public void autenticarNoSV(ServidorVotacao servidorVotacao) throws AutenticacaoFalhouException {
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (certificado == null) {</span>
+<span class="nc" id="L73">            throw new AutenticacaoFalhouException(&quot;Eleitor não possui certificado válido&quot;);</span>
+        }
+
+        try {
+<span class="nc" id="L77">            this.tokenVoto = servidorVotacao.autenticarEleitor(certificado);</span>
+<span class="nc" id="L78">            logger.info(&quot;Eleitor {} autenticado com sucesso. Token: {}&quot;,</span>
+                    identificacao, tokenVoto);
+<span class="nc" id="L80">        } catch (Exception e) {</span>
+<span class="nc" id="L81">            logger.error(&quot;Falha na autenticação do eleitor {}: {}&quot;, identificacao, e.getMessage());</span>
+<span class="nc" id="L82">            throw e;</span>
+<span class="nc" id="L83">        }</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     * Submete o voto criptografado para a urna eletrônica.
+     *
+     * @param opcaoVoto   string representando a escolha do voto
+     * @param urna        urna eletrônica receptora do voto
+     * @param chavePublicaAA chave pública da Autoridade de Apuramento (AA)
+     * @throws Exception se ocorrer erro ao encriptar ou enviar o voto
+     */
+
+    public void votar(String opcaoVoto, UrnaEletronica urna, PublicKey chavePublicaAA) throws Exception {
+        try {
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            if (tokenVoto == null) {</span>
+<span class="nc" id="L98">                throw new IllegalStateException(&quot;Eleitor não autenticado&quot;);</span>
+            }
+
+<span class="nc bnc" id="L101" title="All 4 branches missed.">            if (opcaoVoto == null || opcaoVoto.isBlank()) {</span>
+<span class="nc" id="L102">                throw new IllegalArgumentException(&quot;Opção de voto inválida&quot;);</span>
+            }
+
+<span class="nc" id="L105">            logger.debug(&quot;Eleitor {} votando em: {}&quot;, identificacao, opcaoVoto);</span>
+
+<span class="nc" id="L107">            SecretKey chaveAES = CryptoUtils.generateAESKey();</span>
+<span class="nc" id="L108">            byte[] votoEncriptado = CryptoUtils.encryptAES(opcaoVoto.getBytes(), chaveAES);</span>
+<span class="nc" id="L109">            byte[] chaveEncriptada = CryptoUtils.encryptRSA(chaveAES.getEncoded(), chavePublicaAA);</span>
+
+<span class="nc" id="L111">            PacoteVoto pacote = new PacoteVoto(votoEncriptado, chaveEncriptada);</span>
+<span class="nc" id="L112">            urna.receberVoto(pacote.toByteArray(), tokenVoto);</span>
+
+<span class="nc" id="L114">            logger.info(&quot;Voto do eleitor {} registrado com sucesso&quot;, identificacao);</span>
+<span class="nc" id="L115">        } catch (Exception e) {</span>
+<span class="nc" id="L116">            logger.error(&quot;Erro no voto do eleitor {}: {}&quot;, identificacao, e.getMessage());</span>
+<span class="nc" id="L117">            throw e;</span>
+<span class="nc" id="L118">        }</span>
+<span class="nc" id="L119">    }</span>
+
+    /** @return a identificação do eleitor */
+<span class="nc" id="L122">    public String getIdentificacao() { return identificacao; }</span>
+
+    /** @return a chave pública do eleitor */
+<span class="nc" id="L125">    public PublicKey getChavePublica() { return parChaves.getPublic(); }</span>
+
+    /** @return o certificado assinado recebido da AR */
+<span class="nc" id="L128">    public CertificadoEleitor getCertificado() { return certificado; }</span>
+
+    /** @return o token de autenticação para votação */
+<span class="nc" id="L131">    public UUID getTokenVoto() { return tokenVoto; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

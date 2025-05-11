@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AutoridadeApuramento.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">aa</a> &gt; <span class="el_source">AutoridadeApuramento.java</span></div><h1>AutoridadeApuramento.java</h1><pre class="source lang-java linenums">package aa;
+
+import shared.PacoteVoto;
+import shared.CryptoUtils;
+import shared.exceptions.DescriptografiaFalhouException;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.*;
+import java.util.*;
+
+public class AutoridadeApuramento {
+    private final PrivateKey chavePrivadaAA;
+    private final PublicKey chavePublicaAA;
+    private Map&lt;String, Integer&gt; resultados;
+
+<span class="fc" id="L17">    public AutoridadeApuramento(PrivateKey chavePrivadaAA, PublicKey chavePublicaAA) {</span>
+<span class="fc" id="L18">        this.chavePrivadaAA = chavePrivadaAA;</span>
+<span class="fc" id="L19">        this.chavePublicaAA = chavePublicaAA;</span>
+<span class="fc" id="L20">        this.resultados = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L21">    }</span>
+
+    public List&lt;String&gt; desencriptarVotos(List&lt;byte[]&gt; votosEncriptados) throws Exception {
+<span class="fc" id="L24">        List&lt;String&gt; votosDesencriptados = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">        for (byte[] votoBytes : votosEncriptados) {</span>
+            try {
+<span class="nc" id="L28">                PacoteVoto pacote = PacoteVoto.fromByteArray(votoBytes);</span>
+
+<span class="nc bnc" id="L30" title="All 2 branches missed.">                if (!pacote.verificarIntegridade()) {</span>
+<span class="nc" id="L31">                    throw new DescriptografiaFalhouException(&quot;Integridade do voto comprometida&quot;);</span>
+                }
+
+<span class="nc" id="L34">                byte[] chaveAESBytes = CryptoUtils.decryptRSA(pacote.getChaveEncriptada(), chavePrivadaAA);</span>
+<span class="nc" id="L35">                SecretKey chaveAES = new SecretKeySpec(chaveAESBytes, &quot;AES&quot;);</span>
+
+<span class="nc" id="L37">                String voto = new String(CryptoUtils.decryptAES(pacote.getVotoEncriptado(), chaveAES));</span>
+<span class="nc" id="L38">                votosDesencriptados.add(voto);</span>
+<span class="nc" id="L39">            } catch (Exception e) {</span>
+<span class="nc" id="L40">                throw new DescriptografiaFalhouException(&quot;Falha ao processar voto: &quot; + e.getMessage());</span>
+<span class="nc" id="L41">            }</span>
+<span class="nc" id="L42">        }</span>
+
+<span class="fc" id="L44">        return votosDesencriptados;</span>
+    }
+
+    public Map&lt;String, Integer&gt; apurarVotos(List&lt;String&gt; votos) {
+<span class="fc" id="L48">        resultados = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (String voto : votos) {</span>
+<span class="fc" id="L50">            resultados.put(voto, resultados.getOrDefault(voto, 0) + 1);</span>
+<span class="fc" id="L51">        }</span>
+<span class="fc" id="L52">        return new HashMap&lt;&gt;(resultados);</span>
+    }
+
+    public String gerarRelatorio() {
+<span class="fc" id="L56">        StringBuilder relatorio = new StringBuilder();</span>
+<span class="fc" id="L57">        resultados.entrySet().stream()</span>
+<span class="fc" id="L58">                .sorted(Map.Entry.&lt;String, Integer&gt;comparingByValue().reversed())</span>
+<span class="fc" id="L59">                .forEach(entry -&gt; relatorio.append(&quot;- &quot;).append(entry.getKey()).append(&quot;: &quot;).append(entry.getValue()).append(&quot; votos\n&quot;));</span>
+
+<span class="fc" id="L61">        relatorio.append(&quot;\n=== RELATÓRIO DE APURAMENTO ===\n&quot;);</span>
+<span class="fc" id="L62">        relatorio.append(&quot;Total de votos apurados: &quot;).append(resultados.values().stream().mapToInt(Integer::intValue).sum()).append(&quot;\n\n&quot;);</span>
+
+<span class="fc" id="L64">        relatorio.append(&quot;\n=== FIM DO RELATÓRIO ===&quot;);</span>
+<span class="fc" id="L65">        return relatorio.toString();</span>
+    }
+
+    public PublicKey getChavePublicaAA() {
+<span class="fc" id="L69">        return chavePublicaAA;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

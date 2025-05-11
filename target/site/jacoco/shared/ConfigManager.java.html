@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfigManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">shared</a> &gt; <span class="el_source">ConfigManager.java</span></div><h1>ConfigManager.java</h1><pre class="source lang-java linenums">package shared;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Classe responsável por carregar e fornecer informações sobre os candidatos
+ * a partir de um ficheiro de configuração.
+ */
+public class ConfigManager {
+<span class="fc" id="L17">    private static final Logger logger = LogManager.getLogger(ConfigManager.class);</span>
+    private static final String CANDIDATOS_FILE = &quot;src/main/resources/candidatos.txt&quot;;
+    private List&lt;String&gt; candidatos;
+    private Map&lt;String, String&gt; candidatosInfo;
+
+    /**
+     * Construtor que inicializa o carregamento dos candidatos e suas descrições.
+     */
+<span class="fc" id="L25">    public ConfigManager() {</span>
+<span class="fc" id="L26">        carregarCandidatos();</span>
+<span class="fc" id="L27">        carregarInfoCandidatos();</span>
+<span class="fc" id="L28">    }</span>
+    /**
+     * Lê o ficheiro candidatos.txt e armazena os nomes dos candidatos.
+     * Lança uma RuntimeException em caso de erro.
+     */
+    private void carregarCandidatos() {
+        try {
+<span class="fc" id="L35">            var inputStream = getClass().getClassLoader().getResourceAsStream(&quot;candidatos.txt&quot;);</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">            if (inputStream == null) {</span>
+<span class="nc" id="L37">                throw new IOException(&quot;Ficheiro candidatos.txt não encontrado no classpath.&quot;);</span>
+            }
+
+<span class="fc" id="L40">            try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream))) {</span>
+<span class="fc" id="L41">                candidatos = reader.lines().toList();</span>
+            }
+
+<span class="fc" id="L44">            logger.info(&quot;{} candidatos carregados: {}&quot;, candidatos.size(), candidatos);</span>
+<span class="nc" id="L45">        } catch (IOException e) {</span>
+<span class="nc" id="L46">            logger.error(&quot;Falha ao carregar candidatos: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L47">            throw new RuntimeException(&quot;Erro crítico: não foi possível carregar candidatos&quot;, e);</span>
+<span class="fc" id="L48">        }</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * Inicializa o mapa com informações descritivas sobre cada candidato.
+     */
+    private void carregarInfoCandidatos() {
+<span class="fc" id="L55">        candidatosInfo = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L56">        candidatosInfo.put(&quot;Donald Trump&quot;, &quot;Make Voting Great Again.&quot;);</span>
+<span class="fc" id="L57">        candidatosInfo.put(&quot;Elon Musk&quot;, &quot;Promete levar teu voto para Marte.&quot;);</span>
+<span class="fc" id="L58">        candidatosInfo.put(&quot;Papa Leão XIV&quot;, &quot;Unção divina com estratégia eleitoral.&quot;);</span>
+<span class="fc" id="L59">        candidatosInfo.put(&quot;Galileu Galilei&quot;, &quot;eppur si muove… nas pesquisas.&quot;);</span>
+<span class="fc" id="L60">        candidatosInfo.put(&quot;Albert Einstein&quot;, &quot;Relatividade aplicada às urnas.&quot;);</span>
+<span class="fc" id="L61">        candidatosInfo.put(&quot;Arnold Schwarzenegger&quot;, &quot;Já fui governador, por que não presidente?&quot;);</span>
+<span class="fc" id="L62">        candidatosInfo.put(&quot;Napoleão Bonaparte&quot;, &quot;Pequeno no tamanho, gigante nas ambições.&quot;);</span>
+<span class="fc" id="L63">        candidatosInfo.put(&quot;Alexandre, o Grande&quot;, &quot;Sempre um passo à frente&quot;);</span>
+<span class="fc" id="L64">        candidatosInfo.put(&quot;Leonardo da Vinci&quot;, &quot;Arte, ciencia e governo.&quot;);</span>
+<span class="fc" id="L65">        candidatosInfo.put(&quot;William Shakespeare&quot;, &quot;Caiu uma maçã, mas ele se levantou!&quot;);</span>
+<span class="fc" id="L66">        candidatosInfo.put(&quot;Isaac Newton&quot;, &quot;Ser ou não ser eleito?&quot;);</span>
+
+<span class="fc" id="L68">    }</span>
+    /**
+     * Retorna a lista de todos os candidatos carregados.
+     *
+     * @return lista de nomes de candidatos
+     */
+    public List&lt;String&gt; getCandidatos() {
+<span class="fc" id="L75">        return candidatos;</span>
+    }
+    /**
+     * Retorna a descrição do candidato fornecido.
+     *
+     * @param nome nome do candidato
+     * @return descrição ou \&quot;Sem informação\&quot; se não encontrado
+     */
+    public String getInfoCandidato(String nome) {
+<span class="fc" id="L84">        return candidatosInfo.getOrDefault(nome, &quot;Sem informação&quot;);</span>
+    }
+    /**
+     * Verifica se o nome passado pertence à lista de candidatos válidos.
+     *
+     * @param nome nome do candidato
+     * @return true se estiver na lista, false caso contrário
+     */
+    public boolean isCandidatoValido(String nome) {
+<span class="fc" id="L93">        return candidatos.contains(nome);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

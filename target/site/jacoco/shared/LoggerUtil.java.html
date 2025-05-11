@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoggerUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">shared</a> &gt; <span class="el_source">LoggerUtil.java</span></div><h1>LoggerUtil.java</h1><pre class="source lang-java linenums">package shared;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ *  log para padronizar mensagens de informação, erro, debug e segurança.
+ */
+<span class="nc" id="L9">public class LoggerUtil {</span>
+<span class="nc" id="L10">    private static final Logger logger = LogManager.getLogger(LoggerUtil.class);</span>
+
+    /**
+     * Registra uma mensagem informativa no log padrão.
+     * @param message mensagem a ser registrada
+     */
+    public static void logInfo(String message) {
+<span class="nc" id="L17">        logger.info(message);</span>
+<span class="nc" id="L18">    }</span>
+
+    /**
+     * Registra uma mensagem de erro com exceção no log padrão.
+     * @param message mensagem de erro
+     * @param throwable exceção associada ao erro
+     */
+    public static void logError(String message, Throwable throwable) {
+<span class="nc" id="L26">        logger.error(message, throwable);</span>
+<span class="nc" id="L27">    }</span>
+
+    /**
+     * Registra uma mensagem de debug no log padrão.
+     * @param message mensagem para debugging
+     */
+    public static void logDebug(String message) {
+<span class="nc" id="L34">        logger.debug(message);</span>
+<span class="nc" id="L35">    }</span>
+
+    /**
+     * Registra um evento de segurança no log de segurança.
+     * @param event descrição do evento de segurança
+     */
+    public static void logSecurityEvent(String event) {
+<span class="nc" id="L42">        Logger securityLogger = LogManager.getLogger(&quot;SecurityLogger&quot;);</span>
+<span class="nc" id="L43">        securityLogger.info(&quot;[SECURITY] &quot; + event);</span>
+<span class="nc" id="L44">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

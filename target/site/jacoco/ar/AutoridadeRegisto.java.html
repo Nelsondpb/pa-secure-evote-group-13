@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AutoridadeRegisto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">ar</a> &gt; <span class="el_source">AutoridadeRegisto.java</span></div><h1>AutoridadeRegisto.java</h1><pre class="source lang-java linenums">package ar;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import shared.CertificadoEleitor;
+import java.security.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
+import java.util.Optional;
+
+
+/**
+ * Representa a Autoridade de Registo responsável por:
+ * &lt;ul&gt;
+ *   &lt;li&gt;Registar novos eleitores, assinando digitalmente os seus certificados&lt;/li&gt;
+ *   &lt;li&gt;Validar certificados recebidos de eleitores&lt;/li&gt;
+ *   &lt;li&gt;Revogar certificados e manter uma lista CRL (Certificate Revocation List)&lt;/li&gt;
+ * &lt;/ul&gt;
+ */
+
+public class AutoridadeRegisto {
+<span class="fc" id="L22">    private static final Logger logger = LogManager.getLogger(AutoridadeRegisto.class);</span>
+<span class="fc" id="L23">    private static final Logger securityLogger = LogManager.getLogger(&quot;SecurityLogger&quot;);</span>
+
+    private final PrivateKey chavePrivadaAR;
+    private final PublicKey chavePublicaAR;
+<span class="fc" id="L27">    private final List&lt;CertificadoEleitor&gt; eleitoresRegistados = new CopyOnWriteArrayList&lt;&gt;();</span>
+    private final CertificateRevocationList crl;
+
+
+    /**
+     * Cria uma nova instância da Autoridade de Registo.
+     *
+     * @param chavePrivadaAR chave privada para assinar certificados
+     * @param chavePublicaAR chave pública correspondente para verificação
+     */
+
+<span class="fc" id="L38">    public AutoridadeRegisto(PrivateKey chavePrivadaAR, PublicKey chavePublicaAR) {</span>
+<span class="fc" id="L39">        this.chavePrivadaAR = chavePrivadaAR;</span>
+<span class="fc" id="L40">        this.chavePublicaAR = chavePublicaAR;</span>
+<span class="fc" id="L41">        this.crl = new CertificateRevocationList();</span>
+<span class="fc" id="L42">        logger.info(&quot;AutoridadeRegisto inicializada com chaves públicas e privadas&quot;);</span>
+<span class="fc" id="L43">    }</span>
+
+
+    /**
+     * Regista um novo eleitor, assinando o seu certificado digitalmente.
+     *
+     * @param certificado certificado do eleitor
+     * @throws Exception se o eleitor já estiver registado ou falhar a assinatura
+     */
+
+    public synchronized void registarEleitor(CertificadoEleitor certificado) throws Exception {
+        try {
+<span class="fc" id="L55">            logger.debug(&quot;Iniciando registro para: {}&quot;, certificado.getIdentificacao());</span>
+
+<span class="fc" id="L57">            if (eleitoresRegistados.stream()</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                    .anyMatch(c -&gt; c.getIdentificacao().equals(certificado.getIdentificacao()))) {</span>
+<span class="fc" id="L59">                throw new Exception(&quot;Eleitor já registrado&quot;);</span>
+            }
+
+<span class="fc" id="L62">            Signature sig = Signature.getInstance(&quot;SHA256withRSA&quot;);</span>
+<span class="fc" id="L63">            sig.initSign(chavePrivadaAR);</span>
+<span class="fc" id="L64">            sig.update(certificado.getDadosParaAssinatura());</span>
+<span class="fc" id="L65">            byte[] assinatura = sig.sign();</span>
+<span class="fc" id="L66">            certificado.setAssinatura(assinatura);</span>
+
+<span class="fc" id="L68">            eleitoresRegistados.add(certificado);</span>
+
+<span class="fc" id="L70">            securityLogger.info(&quot;REGISTRO_COMPLETO: {}&quot;, certificado.getIdentificacao());</span>
+<span class="fc" id="L71">            logger.info(&quot;Novo eleitor registrado: {}&quot;, certificado.getIdentificacao());</span>
+<span class="fc" id="L72">        } catch (Exception e) {</span>
+<span class="fc" id="L73">            logger.error(&quot;Falha no registro do eleitor {}: {}&quot;,</span>
+<span class="fc" id="L74">                    certificado.getIdentificacao(), e.getMessage(), e);</span>
+<span class="fc" id="L75">            throw e;</span>
+<span class="fc" id="L76">        }</span>
+<span class="fc" id="L77">    }</span>
+
+    /**
+     * Valida um certificado de eleitor.
+     *
+     * @param certificado certificado a ser validado
+     * @return true se o certificado for válido, não revogado e estiver registado; false caso contrário
+     */
+
+    public synchronized boolean validarCertificado(CertificadoEleitor certificado) {
+        try {
+<span class="fc" id="L88">            logger.debug(&quot;Validando certificado para: {}&quot;, certificado.getIdentificacao());</span>
+
+<span class="pc bpc" id="L90" title="1 of 4 branches missed.">            if (!certificado.isValido() || crl.isRevogado(certificado.getIdentificacao())) {</span>
+<span class="fc" id="L91">                logger.warn(&quot;Certificado inválido ou revogado: {}&quot;, certificado.getIdentificacao());</span>
+<span class="fc" id="L92">                return false;</span>
+            }
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">            if (!certificado.verificarAssinatura(chavePublicaAR)) {</span>
+<span class="fc" id="L96">                logger.warn(&quot;Assinatura inválida para: {}&quot;, certificado.getIdentificacao());</span>
+<span class="fc" id="L97">                return false;</span>
+            }
+
+<span class="fc" id="L100">            boolean registrado = eleitoresRegistados.stream()</span>
+<span class="fc" id="L101">                    .anyMatch(c -&gt; c.getIdentificacao().equals(certificado.getIdentificacao()));</span>
+
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (registrado) {</span>
+<span class="fc" id="L104">                securityLogger.info(&quot;VALIDACAO_CERTIFICADO_SUCESSO: {}&quot;,</span>
+<span class="fc" id="L105">                        certificado.getIdentificacao());</span>
+            } else {
+<span class="nc" id="L107">                logger.warn(&quot;Certificado não registrado: {}&quot;, certificado.getIdentificacao());</span>
+            }
+
+<span class="fc" id="L110">            return registrado;</span>
+<span class="nc" id="L111">        } catch (Exception e) {</span>
+<span class="nc" id="L112">            logger.error(&quot;Erro na validação do certificado: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L113">            return false;</span>
+        }
+    }
+    /**
+     * Revoga o certificado de um eleitor previamente registado.
+     *
+     * @param identificacaoEleitor ID do eleitor cujo certificado será revogado
+     */
+
+    public synchronized void revogarCertificado(String identificacaoEleitor) {
+<span class="fc" id="L123">        Optional&lt;CertificadoEleitor&gt; certificado = eleitoresRegistados.stream()</span>
+<span class="fc" id="L124">                .filter(c -&gt; c.getIdentificacao().equals(identificacaoEleitor))</span>
+<span class="fc" id="L125">                .findFirst();</span>
+
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if (certificado.isPresent()) {</span>
+<span class="fc" id="L128">            certificado.get().revogar();</span>
+<span class="fc" id="L129">            crl.adicionarRevogacao(certificado.get());</span>
+<span class="fc" id="L130">            logger.info(&quot;Certificado revogado: {}&quot;, identificacaoEleitor);</span>
+<span class="fc" id="L131">            securityLogger.warn(&quot;CERTIFICADO_REVOGADO: {}&quot;, identificacaoEleitor);</span>
+
+<span class="fc" id="L133">            new NotificadorService().notificarRevogacao(identificacaoEleitor);</span>
+        }
+<span class="fc" id="L135">    }</span>
+
+
+    /**
+     * Obtém todos os eleitores registados.
+     *
+     * @return lista imutável com os eleitores registados
+     */
+    public List&lt;CertificadoEleitor&gt; getEleitoresRegistados() {
+<span class="fc" id="L144">        return new CopyOnWriteArrayList&lt;&gt;(eleitoresRegistados);</span>
+    }
+
+
+    /**
+     * Obtém a lista de certificados revogados (CRL).
+     *
+     * @return lista dos certificados atualmente revogados
+     */
+    public List&lt;CertificadoEleitor&gt; getCertificadosRevogados() {
+<span class="fc" id="L154">        return crl.getCRL();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

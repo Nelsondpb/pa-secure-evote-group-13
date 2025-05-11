@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UrnaEletronica.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">ue</a> &gt; <span class="el_source">UrnaEletronica.java</span></div><h1>UrnaEletronica.java</h1><pre class="source lang-java linenums">package ue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import sv.ServidorVotacao;
+import shared.*;
+import shared.exceptions.*;
+
+import java.io.IOException;
+import java.util.*;
+import java.nio.file.*;
+
+/**
+ * Representa uma urna eletrônica para recepção e persistência de votos encriptados.
+ * Controla o estado da votação, valida tokens, armazena votos e gerencia os candidatos através do {@link ConfigManager}.
+ */
+public class UrnaEletronica {
+<span class="nc" id="L18">    private static final Logger logger = LogManager.getLogger(UrnaEletronica.class);</span>
+    private static final String VOTOS_FILE = &quot;votos_encrypted.bin&quot;;
+
+    private final ServidorVotacao servidorVotacao;
+    private final ConfigManager configManager;
+<span class="nc" id="L23">    private final List&lt;Voto&gt; votos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L24">    private boolean votacaoEncerrada = false;</span>
+
+    /**
+     * Construtor da urna eletrônica.
+     *
+     * @param servidorVotacao servidor responsável pela validação de tokens
+     */
+<span class="nc" id="L31">    public UrnaEletronica(ServidorVotacao servidorVotacao) {</span>
+<span class="nc" id="L32">        this.servidorVotacao = servidorVotacao;</span>
+<span class="nc" id="L33">        this.configManager = new ConfigManager();</span>
+<span class="nc" id="L34">        logger.info(&quot;Urna eletrônica inicializada. Candidatos válidos: {}&quot;,</span>
+<span class="nc" id="L35">                configManager.getCandidatos());</span>
+<span class="nc" id="L36">    }</span>
+
+    /**
+     * Recebe um voto encriptado e o armazena caso o token seja válido e a votação esteja ativa.
+     *
+     * @param votoEncriptado dados do voto cifrado
+     * @param token token de autenticação do eleitor
+     * @throws TokenInvalidoException se o token for inválido
+     * @throws VotoInvalidoException se os dados do voto forem nulos ou houver falha na persistência
+     * @throws VotacaoEncerradaException se a votação já estiver encerrada
+     */
+    public void receberVoto(byte[] votoEncriptado, UUID token)
+            throws TokenInvalidoException, VotoInvalidoException, VotacaoEncerradaException {
+
+        try {
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            if (votacaoEncerrada) {</span>
+<span class="nc" id="L52">                throw new VotacaoEncerradaException(&quot;Período de votação encerrado&quot;);</span>
+            }
+
+<span class="nc bnc" id="L55" title="All 4 branches missed.">            if (token == null || !servidorVotacao.validarToken(token)) {</span>
+<span class="nc" id="L56">                throw new TokenInvalidoException(&quot;Token inválido ou já utilizado&quot;);</span>
+            }
+
+<span class="nc bnc" id="L59" title="All 4 branches missed.">            if (votoEncriptado == null || votoEncriptado.length == 0) {</span>
+<span class="nc" id="L60">                throw new VotoInvalidoException(&quot;Voto encriptado é inválido&quot;);</span>
+            }
+
+<span class="nc" id="L63">            votos.add(new Voto(votoEncriptado, token));</span>
+<span class="nc" id="L64">            persistirVoto(votoEncriptado);</span>
+
+<span class="nc" id="L66">            logger.info(&quot;Voto recebido e persistido. Total: {}&quot;, votos.size());</span>
+<span class="nc" id="L67">        } catch (Exception e) {</span>
+<span class="nc" id="L68">            logger.error(&quot;Erro ao processar voto: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L69">            throw e;</span>
+<span class="nc" id="L70">        }</span>
+<span class="nc" id="L71">    }</span>
+
+    /**
+     * Persiste o voto encriptado em disco no arquivo definido.
+     *
+     * @param votoEncriptado voto a ser salvo
+     * @throws VotoInvalidoException se houver erro de I/O
+     */
+    private void persistirVoto(byte[] votoEncriptado) throws VotoInvalidoException {
+        try {
+<span class="nc" id="L81">            Files.write(</span>
+<span class="nc" id="L82">                    Paths.get(VOTOS_FILE),</span>
+                    votoEncriptado,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
+            );
+<span class="nc" id="L87">        } catch (IOException e) {</span>
+<span class="nc" id="L88">            throw new VotoInvalidoException(&quot;Falha ao persistir voto: &quot; + e.getMessage());</span>
+<span class="nc" id="L89">        }</span>
+<span class="nc" id="L90">    }</span>
+
+    /**
+     * Retorna a lista de votos encriptados.
+     *
+     * @return lista de votos
+     */
+    public List&lt;byte[]&gt; getVotosEncriptados() {
+<span class="nc" id="L98">        return new ArrayList&lt;&gt;(votos.stream()</span>
+<span class="nc" id="L99">                .map(Voto::getVotoEncriptado)</span>
+<span class="nc" id="L100">                .toList());</span>
+    }
+
+    /**
+     * Encerra a votação, impedindo o recebimento de novos votos.
+     */
+    public void encerrarVotacao() {
+<span class="nc" id="L107">        this.votacaoEncerrada = true;</span>
+<span class="nc" id="L108">        logger.info(&quot;Votação encerrada. Total de votos: {}&quot;, votos.size());</span>
+<span class="nc" id="L109">    }</span>
+
+    /**
+     * Indica se a votação foi encerrada.
+     *
+     * @return true se encerrada, false caso contrário
+     */
+    public boolean isVotacaoEncerrada() {
+<span class="nc" id="L117">        return votacaoEncerrada;</span>
+    }
+
+    /**
+     * Retorna o total de votos recebidos.
+     *
+     * @return total de votos
+     */
+    public int getTotalVotos() {
+<span class="nc" id="L126">        return votos.size();</span>
+    }
+
+    /**
+     * Classe interna que representa um voto unitário.
+     */
+    private static class Voto {
+        private final byte[] votoEncriptado;
+        private final UUID token;
+
+<span class="nc" id="L136">        public Voto(byte[] votoEncriptado, UUID token) {</span>
+<span class="nc" id="L137">            this.votoEncriptado = votoEncriptado;</span>
+<span class="nc" id="L138">            this.token = token;</span>
+<span class="nc" id="L139">        }</span>
+
+        public byte[] getVotoEncriptado() {
+<span class="nc" id="L142">            return votoEncriptado;</span>
+        }
+    }
+
+    /**
+     * Retorna o gerenciador de configurações, incluindo os candidatos.
+     *
+     * @return {@link ConfigManager} associado
+     */
+    public ConfigManager getConfigManager() {
+<span class="nc" id="L152">        return this.configManager;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

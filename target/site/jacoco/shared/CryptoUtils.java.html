@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CryptoUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projeto2-Grupo13</a> &gt; <a href="index.source.html" class="el_package">shared</a> &gt; <span class="el_source">CryptoUtils.java</span></div><h1>CryptoUtils.java</h1><pre class="source lang-java linenums">package shared;
+
+import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
+import java.security.*;
+import java.util.Arrays;
+
+/**
+ * Classe  para operações de criptografia utilizando os algoritmos AES e RSA.
+ * Fornece métodos para gerar chaves, encriptar e desencriptar dados.
+ */
+<span class="nc" id="L12">public class CryptoUtils {</span>
+    private static final String RSA_ALGORITHM = &quot;RSA&quot;;
+    private static final String AES_ALGORITHM = &quot;AES&quot;;
+    private static final String AES_TRANSFORMATION = &quot;AES/GCM/NoPadding&quot;;
+    private static final int GCM_TAG_LENGTH = 128;
+    private static final int AES_KEY_SIZE = 256;
+    private static final int RSA_KEY_SIZE = 2048;
+
+
+    /**
+     * Gera uma chave simétrica AES com tamanho de 256 bits.
+     * @return chave AES gerada
+     * @throws NoSuchAlgorithmException se o algoritmo AES não estiver disponível
+     */
+    public static SecretKey generateAESKey() throws NoSuchAlgorithmException {
+<span class="fc" id="L27">        KeyGenerator keyGen = KeyGenerator.getInstance(AES_ALGORITHM);</span>
+<span class="fc" id="L28">        keyGen.init(AES_KEY_SIZE);</span>
+<span class="fc" id="L29">        return keyGen.generateKey();</span>
+    }
+
+    /**
+     * Encripta dados com AES usando GCM e IV aleatório.
+     * @param data dados a encriptar
+     * @param key chave AES usada para encriptação
+     * @return vetor IV concatenado com os dados encriptados
+     * @throws Exception em caso de erro durante a encriptação
+     */
+
+    public static byte[] encryptAES(byte[] data, SecretKey key) throws Exception {
+<span class="fc" id="L41">        Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);</span>
+<span class="fc" id="L42">        byte[] iv = new byte[12]; // 96 bits para GCM</span>
+<span class="fc" id="L43">        new SecureRandom().nextBytes(iv);</span>
+
+<span class="fc" id="L45">        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);</span>
+<span class="fc" id="L46">        cipher.init(Cipher.ENCRYPT_MODE, key, spec);</span>
+
+<span class="fc" id="L48">        byte[] encrypted = cipher.doFinal(data);</span>
+<span class="fc" id="L49">        byte[] result = new byte[iv.length + encrypted.length];</span>
+<span class="fc" id="L50">        System.arraycopy(iv, 0, result, 0, iv.length);</span>
+<span class="fc" id="L51">        System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);</span>
+
+<span class="fc" id="L53">        return result;</span>
+    }
+
+    /**
+     * Desencripta dados encriptados com AES em modo GCM.
+     * @param encryptedData dados encriptados com IV
+     * @param key chave AES para desencriptação
+     * @return dados desencriptados
+     * @throws Exception em caso de falha na desencriptação
+     */
+    public static byte[] decryptAES(byte[] encryptedData, SecretKey key) throws Exception {
+<span class="fc" id="L64">        Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);</span>
+
+<span class="fc" id="L66">        byte[] iv = Arrays.copyOfRange(encryptedData, 0, 12);</span>
+<span class="fc" id="L67">        byte[] cipherText = Arrays.copyOfRange(encryptedData, 12, encryptedData.length);</span>
+
+<span class="fc" id="L69">        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);</span>
+<span class="fc" id="L70">        cipher.init(Cipher.DECRYPT_MODE, key, spec);</span>
+
+<span class="fc" id="L72">        return cipher.doFinal(cipherText);</span>
+    }
+
+    /**
+     * Encripta dados usando criptografia assimétrica RSA.
+     * @param data dados a encriptar
+     * @param publicKey chave pública usada para encriptação
+     * @return dados encriptados
+     * @throws Exception em caso de erro na encriptação
+     */
+    public static byte[] encryptRSA(byte[] data, PublicKey publicKey) throws Exception {
+<span class="fc" id="L83">        Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);</span>
+<span class="fc" id="L84">        cipher.init(Cipher.ENCRYPT_MODE, publicKey);</span>
+<span class="fc" id="L85">        return cipher.doFinal(data);</span>
+    }
+
+    /**
+     * Desencripta dados encriptados com RSA.
+     * @param data dados encriptados
+     * @param privateKey chave privada para desencriptação
+     * @return dados desencriptados
+     * @throws Exception em caso de falha na desencriptação
+     */
+    public static byte[] decryptRSA(byte[] data, PrivateKey privateKey) throws Exception {
+<span class="fc" id="L96">        Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);</span>
+<span class="fc" id="L97">        cipher.init(Cipher.DECRYPT_MODE, privateKey);</span>
+<span class="fc" id="L98">        return cipher.doFinal(data);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
