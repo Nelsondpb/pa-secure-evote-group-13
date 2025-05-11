@@ -4,82 +4,96 @@ import java.io.*;
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.UUID;
-import java.io.Serializable;
+import java.util.Date;
 
 public class CertificadoEleitor implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String numeroSerie;
     private final String identificacao;
     private transient PublicKey chavePublica;
     private byte[] assinatura;
-    private final String algoritmoAssinatura = "SHA256withRSA";
+    private byte[] chavePublicaBytes;
+    private final Date dataEmissao;
+    private final Date dataExpiracao;
+    private boolean revogado;
 
     public CertificadoEleitor(String identificacao, PublicKey chavePublica) {
-        this.numeroSerie = UUID.randomUUID().toString();
         this.identificacao = identificacao;
         this.chavePublica = chavePublica;
+        this.chavePublicaBytes = chavePublica.getEncoded();
+        this.dataEmissao = new Date();
+        this.dataExpiracao = calcularDataExpiracao();
+        this.revogado = false;
     }
 
-    public void assinar(PrivateKey chavePrivadaAR)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance(algoritmoAssinatura);
-        signature.initSign(chavePrivadaAR);
-        signature.update(this.toByteArray());
-        this.assinatura = signature.sign();
-    }
-
-    public boolean verificarAssinatura(PublicKey chavePublicaAR)
-            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        if (assinatura == null) return false;
-
-        Signature signature = Signature.getInstance(algoritmoAssinatura);
-        signature.initVerify(chavePublicaAR);
-        signature.update(this.toByteArray());
-        return signature.verify(assinatura);
-    }
-
-    private byte[] toByteArray() {
-        String dados = numeroSerie + identificacao + chavePublicaToString();
-        return dados.getBytes();
+    private Date calcularDataExpiracao() {
+        long umAnoEmMillis = 365L * 24 * 60 * 60 * 1000;
+        return new Date(dataEmissao.getTime() + umAnoEmMillis);
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
-        out.writeObject(chavePublica != null ? chavePublica.getEncoded() : null);
+        out.writeObject(this.chavePublicaBytes);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        byte[] keyBytes = (byte[]) in.readObject();
-        if (keyBytes != null) {
-            try {
-                this.chavePublica = KeyFactory.getInstance("RSA")
-                        .generatePublic(new X509EncodedKeySpec(keyBytes));
-            } catch (Exception e) {
-                throw new IOException("Erro ao reconstruir PublicKey", e);
-            }
+        this.chavePublicaBytes = (byte[]) in.readObject();
+        try {
+            this.chavePublica = KeyFactory.getInstance("RSA")
+                    .generatePublic(new X509EncodedKeySpec(chavePublicaBytes));
+        } catch (Exception e) {
+            throw new IOException("Falha ao reconstruir PublicKey", e);
         }
     }
 
-    private String chavePublicaToString() {
-        byte[] encodedKey = chavePublica.getEncoded();
-        return Base64.getEncoder().encodeToString(encodedKey);
+    public boolean isValido() {
+        Date agora = new Date();
+        return !revogado && agora.before(dataExpiracao);
     }
 
-    // Getters
-    public String getNumeroSerie() { return numeroSerie; }
-    public String getIdentificacao() { return identificacao; }
-    public PublicKey getChavePublica() { return chavePublica; }
-    public byte[] getAssinatura() { return assinatura; }
+    public void revogar() {
+        this.revogado = true;
+    }
+
+    public byte[] getDadosParaAssinatura() {
+        String dados = identificacao + Base64.getEncoder().encodeToString(chavePublicaBytes);
+        return dados.getBytes();
+    }
+
+    public void setAssinatura(byte[] assinatura) {
+        this.assinatura = assinatura;
+    }
+
+    public boolean verificarAssinatura(PublicKey chavePublicaAR) {
+        if (assinatura == null || chavePublicaAR == null) {
+            return false;
+        }
+
+        try {
+            Signature sig = Signature.getInstance("SHA256withRSA");
+            sig.initVerify(chavePublicaAR);
+            sig.update(this.getDadosParaAssinatura());
+            return sig.verify(this.assinatura);
+        } catch (Exception e) {
+            System.err.println("Erro na verificação: " + e.getMessage());
+            return false;
+        }
+    }
 
     public String toPemFormat() {
         return "-----BEGIN CERTIFICATE-----\n" +
-                "Numero Serie: " + numeroSerie + "\n" +
-                "Identificacao: " + identificacao + "\n" +
-                "Chave Publica: " + chavePublicaToString() + "\n" +
-                (assinatura != null ? "Assinatura: " + Base64.getEncoder().encodeToString(assinatura) + "\n" : "") +
-                "-----END CERTIFICATE-----";
+                Base64.getEncoder().encodeToString(this.getDadosParaAssinatura()) +
+                "\n-----END CERTIFICATE-----\n" +
+                "Assinatura: " + (assinatura != null ? Base64.getEncoder().encodeToString(assinatura) : "NÃO ASSINADO") +
+                "\nValidade: " + (isValido() ? "VÁLIDO" : "INVÁLIDO") +
+                "\nExpira em: " + dataExpiracao;
     }
+
+    public String getIdentificacao() { return identificacao; }
+    public PublicKey getChavePublica() { return chavePublica; }
+    public byte[] getAssinatura() { return assinatura; }
+    public Date getDataEmissao() { return dataEmissao; }
+    public Date getDataExpiracao() { return dataExpiracao; }
+    public boolean isRevogado() { return revogado; }
 }

@@ -1,133 +1,184 @@
-import aa.AutoridadeApuramento;
-import ar.AutoridadeRegisto;
-import ar.ARServer;
-import eleitor.Eleitor;
-import shared.CertificadoEleitor;
-import sv.ServidorVotacao;
-import ue.UrnaEletronica;
-import shared.exceptions.*;
+    import aa.AutoridadeApuramento;
+    import ar.AutoridadeRegisto;
+    import ar.ARServer;
+    import eleitor.Eleitor;
+    import shared.CertificadoEleitor;
+    import sv.ServidorVotacao;
+    import ue.UrnaEletronica;
 
-import java.io.IOException;
-import java.security.*;
+    import java.security.*;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Scanner;
 
-public class Main {
-    private static final int SSL_PORT = 9090;
-    private static final int SERVER_START_DELAY_MS = 1500;
+    public class Main {
+        private static final int SSL_PORT = 9090;
+        private static final int SERVER_START_DELAY_MS = 1500;
+        private static final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        try {
-            configurarSSL();
+        public static final String RED = "\033[0;31m";
+        public static final String GREEN = "\033[0;32m";
+        public static final String YELLOW = "\033[0;33m";
+        public static final String BLUE = "\033[0;34m";
+        public static final String PURPLE = "\033[0;35m";
+        public static final String CYAN = "\033[0;36m";
+        public static final String RESET = "\033[0m";
 
-            KeyPair parChavesAR = gerarParChavesRSA();
-            KeyPair parChavesAA = gerarParChavesRSA();
-
-            AutoridadeRegisto ar = new AutoridadeRegisto(parChavesAR.getPrivate(), parChavesAR.getPublic());
-            ARServer arServer = new ARServer(ar);
-            AutoridadeApuramento aa = new AutoridadeApuramento(parChavesAA.getPrivate(), parChavesAA.getPublic());
-            ServidorVotacao sv = new ServidorVotacao(ar, aa.getChavePublicaAA());
-            UrnaEletronica ue = new UrnaEletronica(sv);
-
-            iniciarServidorAR(arServer);
-
-            executarFluxoVotacaoCompleto(ar, sv, ue, aa);
-
-        } catch (NoSuchAlgorithmException e) {
-            System.err.println("❌ Erro de criptografia: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("❌ Erro crítico: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private static void configurarSSL() {
-        System.setProperty("javax.net.ssl.keyStore", "src/main/resources/keystore.jks");
-        System.setProperty("javax.net.ssl.keyStorePassword", "password");
-        System.setProperty("javax.net.ssl.trustStore", "src/main/resources/keystore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "password");
-    }
-
-    private static KeyPair gerarParChavesRSA() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(2048);
-        return keyGen.generateKeyPair();
-    }
-
-    private static void iniciarServidorAR(ARServer server) {
-        new Thread(() -> {
+        public static void main(String[] args) {
             try {
-                System.out.println("🔒 Servidor AR iniciando na porta " + SSL_PORT + "...");
-                server.start();
+                configurarSSL();
+
+                KeyPair parChavesAR = gerarParChavesRSA();
+                KeyPair parChavesAA = gerarParChavesRSA();
+
+                AutoridadeRegisto ar = new AutoridadeRegisto(parChavesAR.getPrivate(), parChavesAR.getPublic());
+                ARServer arServer = new ARServer(ar);
+                AutoridadeApuramento aa = new AutoridadeApuramento(parChavesAA.getPrivate(), parChavesAA.getPublic());
+                ServidorVotacao sv = new ServidorVotacao(ar, aa.getChavePublicaAA());
+                UrnaEletronica ue = new UrnaEletronica(sv);
+
+                iniciarServidorAR(arServer);
+                Thread.sleep(SERVER_START_DELAY_MS);
+
+                List<Eleitor> eleitores = new ArrayList<>();
+                Eleitor eleitorAtual = null;
+
+                while (true) {
+                    exibirMenu();
+                    int opcao = scanner.nextInt();
+                    scanner.nextLine();
+
+                    switch (opcao) {
+                        case 1:
+                            eleitorAtual = registrarEleitor(ar);
+                            eleitores.add(eleitorAtual);
+                            break;
+                        case 2:
+                            if (eleitorAtual == null) {
+                                System.out.println(RED + "\n⚠️ Nenhum eleitor registrado. Registre um eleitor primeiro." + RESET);
+                            } else {
+                                autenticarEleitor(eleitorAtual, sv);
+                            }
+                            break;
+                        case 3:
+                            if (eleitorAtual == null || eleitorAtual.getTokenVoto() == null) {
+                                System.out.println(RED + "\n⚠️ Eleitor não autenticado. Autentique primeiro." + RESET);
+                            } else {
+                                votar(eleitorAtual, ue, aa);
+                            }
+                            break;
+                        case 4:
+                            encerrarEApurar(ue, aa);
+                            break;
+                        case 5:
+                            System.out.println(GREEN + "\n✅ Sistema encerrado com sucesso!" + RESET);
+                            System.exit(0);
+                        default:
+                            System.out.println(RED + "\n⚠️ Opção inválida! Tente novamente." + RESET);
+                    }
+                }
+
+            } catch (NoSuchAlgorithmException e) {
+                System.err.println(RED + "❌ Erro de criptografia: " + e.getMessage() + RESET);
             } catch (Exception e) {
-                System.err.println("❌ Falha no servidor AR: " + e.getMessage());
-                System.exit(1);
+                System.err.println(RED + "❌ Erro crítico: " + e.getMessage() + RESET);
+                e.printStackTrace();
+            } finally {
+                scanner.close();
             }
-        }).start();
-    }
+        }
 
-    private static void executarFluxoVotacaoCompleto(AutoridadeRegisto ar, ServidorVotacao sv,
-                                                     UrnaEletronica ue, AutoridadeApuramento aa) {
-        try {
-            Thread.sleep(SERVER_START_DELAY_MS);
-            System.out.println("\n✅ Sistema inicializado. Iniciando processo de votação...");
+        private static void exibirMenu() {
+            System.out.println(PURPLE + "\n===  SISTEMA DE VOTAÇÃO ELETRÔNICA ===" + RESET);
+            System.out.println(CYAN + "1. Registar-se como eleitor");
+            System.out.println("2. Autenticar-se como eleitor");
+            System.out.println("3. Votar nos candidatos");
+            System.out.println("4. Encerrar votação e mostrar resultados");
+            System.out.println("5. Sair" + RESET);
+            System.out.print(YELLOW + "Escolha uma opção: " + RESET);
+        }
 
-            Eleitor eleitor = registrarEleitor(ar);
+        private static void configurarSSL() {
+            System.setProperty("javax.net.ssl.keyStore", "certificates/keystore.p12");
+            System.setProperty("javax.net.ssl.keyStorePassword", "password");
+            System.setProperty("javax.net.ssl.trustStore", "certificates/keystore.p12");
+            System.setProperty("javax.net.ssl.trustStorePassword", "password");
+        }
 
-            autenticarEleitor(eleitor, sv);
+        private static KeyPair gerarParChavesRSA() throws NoSuchAlgorithmException {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(2048);
+            return keyGen.generateKeyPair();
+        }
 
-            submeterVoto(eleitor, ue, aa);
+        private static void iniciarServidorAR(ARServer server) {
+            new Thread(() -> {
+                try {
+                    System.out.println(BLUE + "🔒 Servidor AR iniciando na porta " + SSL_PORT + "..." + RESET);
+                    server.start();
+                } catch (Exception e) {
+                    System.err.println(RED + "❌ Falha no servidor AR: " + e.getMessage() + RESET);
+                    System.exit(1);
+                }
+            }).start();
+        }
 
-            exibirResultados(ue);
+        private static Eleitor registrarEleitor(AutoridadeRegisto ar) throws Exception {
+            System.out.print(CYAN + "\nDigite a identificação do eleitor: " + RESET);
+            String identificacao = scanner.nextLine();
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.err.println("❌ Thread interrompida: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("❌ Erro no fluxo de votação: " + e.getMessage());
-            e.printStackTrace();
+            Eleitor eleitor = new Eleitor(identificacao);
+            CertificadoEleitor certificado = eleitor.registarNaAR();
+
+            System.out.println(GREEN + "\n✅ Eleitor registrado com sucesso!" + RESET);
+            System.out.println(BLUE + "📄 Certificado:\n" + certificado.toPemFormat() + RESET);
+            return eleitor;
+        }
+
+        private static void autenticarEleitor(Eleitor eleitor, ServidorVotacao sv) throws Exception {
+            eleitor.autenticarNoSV(sv);
+            System.out.println(GREEN + "\n✅ Autenticação realizada com sucesso!" + RESET);
+            System.out.println(BLUE + "🔑 Token de voto: " + eleitor.getTokenVoto() + RESET);
+        }
+
+        private static void votar(Eleitor eleitor, UrnaEletronica ue, AutoridadeApuramento aa) throws Exception {
+            System.out.println(PURPLE + "\nCandidatos disponíveis:" + RESET);
+            List<String> candidatos = ue.getConfigManager().getCandidatos();
+
+            for (int i = 0; i < candidatos.size(); i++) {
+                String nomeCandidato = candidatos.get(i);
+                String info = ue.getConfigManager().getInfoCandidato(nomeCandidato);
+                System.out.println(YELLOW + (i+1) + ". " + nomeCandidato + " - \"" + info + "\"" + RESET);
+            }
+
+            System.out.print(CYAN + "Escolha o número do candidato: " + RESET);
+            int opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            if (opcao < 1 || opcao > candidatos.size()) {
+                System.out.println(RED + "\n⚠️ Opção inválida!" + RESET);
+                return;
+            }
+
+            String candidato = candidatos.get(opcao-1);
+            eleitor.votar(candidato, ue, aa.getChavePublicaAA());
+            System.out.println(GREEN + "\n✅ Voto registrado para " + candidato + RESET);
+        }
+
+        private static void encerrarEApurar(UrnaEletronica ue, AutoridadeApuramento aa) {
+            ue.encerrarVotacao();
+            System.out.println(BLUE + "\n⏳ Encerrando votação..." + RESET);
+
+            try {
+                List<byte[]> votosEncriptados = ue.getVotosEncriptados();
+                List<String> votosDesencriptados = aa.desencriptarVotos(votosEncriptados);
+                aa.apurarVotos(votosDesencriptados);
+
+                System.out.println(PURPLE + "\n=== RESULTADOS FINAIS ===" + RESET);
+                System.out.println(CYAN + aa.gerarRelatorio() + RESET);
+            } catch (Exception e) {
+                System.err.println(RED + "\n❌ Erro no apuramento: " + e.getMessage() + RESET);
+                e.printStackTrace();
+            }
         }
     }
-
-    private static Eleitor registrarEleitor(AutoridadeRegisto ar) throws Exception {
-        System.out.println("\n=== FASE 1: REGISTO NA AR ===");
-        Eleitor eleitor = new Eleitor("Eleitor_Teste");
-        CertificadoEleitor certificado = eleitor.registarNaAR();
-
-        System.out.println("📄 Certificado obtido:\n" + certificado.toPemFormat());
-        System.out.println("ℹ️ Eleitores registrados: " + ar.getEleitoresRegistados().size());
-
-        return eleitor;
-    }
-
-    private static void autenticarEleitor(Eleitor eleitor, ServidorVotacao sv) throws Exception {
-        System.out.println("\n=== FASE 2: AUTENTICAÇÃO NO SV ===");
-        eleitor.autenticarNoSV(sv);
-        System.out.println("🔑 Token de voto gerado: " + eleitor.getTokenVoto());
-    }
-
-    private static void submeterVoto(Eleitor eleitor, UrnaEletronica ue, AutoridadeApuramento aa) throws Exception {
-        System.out.println("\n=== FASE 3: VOTAÇÃO ===");
-        String candidato = "CandidatoA";
-        System.out.println("🗳️ Enviando voto para: " + candidato);
-
-        eleitor.votar(candidato, ue, aa.getChavePublicaAA());
-        System.out.println("✅ Voto registado com sucesso!");
-    }
-
-    private static void exibirResultados(UrnaEletronica ue) {
-        System.out.println("\n=== RESULTADOS ===");
-        System.out.println("Total de votos registados: " + ue.getVotosEncriptados().size());
-
-        System.out.println("\n🔍 Hashes dos votos (para debug):");
-        ue.getVotosEncriptados().forEach(voto ->
-                System.out.println(" - " + bytesToHex(voto).substring(0, 32) + "...")
-        );
-    }
-
-    private static String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
-    }
-}

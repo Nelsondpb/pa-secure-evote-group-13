@@ -19,12 +19,21 @@ public class ServidorVotacao {
 
     public UUID autenticarEleitor(CertificadoEleitor certificado) throws AutenticacaoFalhouException {
         try {
+            System.out.println("\n🔐 Iniciando autenticação para: " + certificado.getIdentificacao());
+
+            if (certificado == null) {
+                throw new AutenticacaoFalhouException("Certificado nulo");
+            }
+
             if (!ar.validarCertificado(certificado)) {
                 throw new AutenticacaoFalhouException("Certificado inválido");
             }
-            return tokenService.emitirToken();
+
+            UUID token = tokenService.emitirToken();
+            System.out.println("✅ Token emitido para: " + certificado.getIdentificacao());
+            return token;
         } catch (Exception e) {
-            throw new AutenticacaoFalhouException(e.getMessage());
+            throw new AutenticacaoFalhouException("Falha na autenticação: " + e.getMessage());
         }
     }
 

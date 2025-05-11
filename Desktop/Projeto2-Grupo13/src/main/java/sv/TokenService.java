@@ -14,6 +14,6 @@ public class TokenService {
     }
 
     public boolean validarToken(UUID token) {
-        return tokensEmitidos.remove(token); // Remove se existir
+        return tokensEmitidos.remove(token);
     }
 }

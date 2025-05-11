@@ -2,7 +2,6 @@ package shared;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 import java.util.Arrays;
 
@@ -14,14 +13,12 @@ public class CryptoUtils {
     private static final int AES_KEY_SIZE = 256;
     private static final int RSA_KEY_SIZE = 2048;
 
-    // Geração de chaves AES
     public static SecretKey generateAESKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGen = KeyGenerator.getInstance(AES_ALGORITHM);
         keyGen.init(AES_KEY_SIZE);
         return keyGen.generateKey();
     }
 
-    // Encriptação AES (simétrica)
     public static byte[] encryptAES(byte[] data, SecretKey key) throws Exception {
         Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
         byte[] iv = new byte[12]; // 96 bits para GCM
@@ -38,11 +35,9 @@ public class CryptoUtils {
         return result;
     }
 
-    // Desencriptação AES
     public static byte[] decryptAES(byte[] encryptedData, SecretKey key) throws Exception {
         Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 
-        // Extrair IV dos primeiros 12 bytes
         byte[] iv = Arrays.copyOfRange(encryptedData, 0, 12);
         byte[] cipherText = Arrays.copyOfRange(encryptedData, 12, encryptedData.length);
 
@@ -52,14 +47,12 @@ public class CryptoUtils {
         return cipher.doFinal(cipherText);
     }
 
-    // Encriptação RSA (assimétrica)
     public static byte[] encryptRSA(byte[] data, PublicKey publicKey) throws Exception {
         Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return cipher.doFinal(data);
     }
 
-    // Desencriptação RSA
     public static byte[] decryptRSA(byte[] data, PrivateKey privateKey) throws Exception {
         Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);

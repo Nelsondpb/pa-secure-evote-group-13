@@ -4,6 +4,7 @@ import shared.CertificadoEleitor;
 import shared.NetworkUtils;
 import shared.SSLUtils;
 import javax.net.ssl.SSLSocket;
+import java.io.IOException;
 import java.security.PublicKey;
 
 public class ARClient {
@@ -13,15 +14,27 @@ public class ARClient {
     public static CertificadoEleitor enviarCertificadoParaAR(
             String identificacao, PublicKey chavePublica) throws Exception {
 
-        SSLSocket socket = (SSLSocket) SSLUtils.criarContextoSSL()
-                .getSocketFactory().createSocket(AR_HOST, AR_PORT);
-
+        SSLSocket socket = null;
         try {
+            socket = (SSLSocket) SSLUtils.criarContextoSSL()
+                    .getSocketFactory().createSocket(AR_HOST, AR_PORT);
+
+            socket.setSoTimeout(10000);
+
             CertificadoEleitor certificado = new CertificadoEleitor(identificacao, chavePublica);
             NetworkUtils.sendObject(socket, certificado);
-            return (CertificadoEleitor) NetworkUtils.receiveObject(socket);
+
+            CertificadoEleitor resposta = (CertificadoEleitor) NetworkUtils.receiveObject(socket);
+            return resposta;
+
         } finally {
-            socket.close();
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    System.err.println("Erro ao fechar socket: " + e.getMessage());
+                }
+            }
         }
     }
 }
